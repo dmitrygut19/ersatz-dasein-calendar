@@ -1,0 +1,64 @@
+/* Composition only; component material comes from the installed lino-ui stylesheet. */
+.admin-ui--lino .admin-material-surface { --surface-bg:var(--color-surface); --surface-border:var(--color-border); background:transparent; }
+.admin-ui--lino .admin-material-surface.lino-plate::before,
+.admin-ui--lino .admin-material-surface.lino-plate::after { content:''; position:absolute; inset:calc(-1 * var(--cut-bleed,0px)); border:0; border-image:none; z-index:-1; pointer-events:none; }
+.admin-ui--lino .admin-material-surface.lino-plate::before { background:var(--surface-border); clip-path:var(--cut-0); }
+.admin-ui--lino .admin-material-surface.lino-plate::after { background:var(--surface-bg); clip-path:var(--cut-1); }
+.admin-ui--lino .type-editor { border:0; background:transparent; }
+.admin-ui--lino .field .lino-input { min-width:0; }
+.admin-ui--lino .field .lino-field-label { color:var(--color-text); }
+.admin-ui--lino, .admin-menu-popover { --focus-ring:calc(var(--space-1) / 2) solid var(--accent); --focus-offset:calc(var(--space-1) / 2); }
+.admin-ui--lino .field .lino-input:has(:focus-visible) { outline:var(--focus-ring);outline-offset:var(--focus-offset); }
+.admin-ui--lino .field .lino-input:has([aria-invalid=true]) { --surface-bg:color-mix(in srgb,var(--color-action-background),var(--color-wine) 12%);--surface-border:var(--error); }
+.admin-ui--lino .field .lino-input:has(:disabled) { opacity:.45;cursor:default; }
+.admin-ui--lino .field input:focus-visible,.admin-ui--lino .field textarea:focus-visible { outline:none; }
+.admin-ui--lino .field textarea { outline:none; }
+.admin-ui--lino .field input::selection,.admin-ui--lino .field textarea::selection { background:var(--color-divider);color:var(--color-text); }
+.admin-ui--lino .lodge-audience input { accent-color:var(--color-text); }
+.admin-ui--lino .radio-control { --accent:var(--color-text); }
+.admin-ui--lino .radio-control .radio-mark img { filter:grayscale(1); }
+.admin-ui--lino .admin-switch-field { --color-accent:var(--color-text); }
+.admin-ui--lino .lino-toggle:focus-visible { outline:var(--focus-ring); outline-offset:var(--focus-offset); }
+.admin-ui--lino .degree-badge.lino-tag { background:transparent; --surface-bg:var(--tier-bg); --surface-border:var(--tier-frame); color:var(--tier-ink); }
+.admin-ui--lino .admin-editor-section { display:flex; flex-direction:column; gap:var(--space-4); }
+.admin-ui--lino .color-editor { border:0; background:transparent; }
+.admin-ui--lino .admin-switch-field { display:flex; align-items:center; gap:var(--space-3); min-height:var(--control-height); }
+.admin-tooltip-host { position:fixed; z-index:10000; pointer-events:none; }
+.admin-ui--lino .admin-dropdown { position:absolute; top:calc(100% + var(--space-2)); left:0; width:100%; min-width:min(100%,var(--control-default)); max-height:50dvh; }
+.admin-ui--lino .admin-dropdown [role=option] { min-width:0; white-space:normal; overflow-wrap:anywhere; }
+.admin-ui--lino .lino-field-select { position:relative; display:flex; flex:1; min-width:0; }
+.admin-ui--lino .lino-select-trigger { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); width:100%; min-height:var(--control-height); padding:0 var(--space-3); color:var(--color-action-text); background:none; border:0; font:500 var(--text-sm)/1.2 var(--font-text); text-align:left; }
+.admin-ui--lino .lino-select-trigger > span { min-width:0; overflow-wrap:anywhere; }
+.admin-ui--lino .lino-select-trigger:disabled { color:var(--color-muted); }
+.admin-ui--lino .lino-select-trigger > .lino-glyph { rotate:-90deg; }
+.admin-ui--lino .reminder-cell .lino-glyph { --icon-size:var(--space-4); }
+.admin-ui--lino .lino-multiline { height:auto; min-height:var(--control-height); }
+.admin-ui--lino .lino-input > textarea { width:100%; min-width:0; padding:var(--space-3); border:0; background:transparent; color:var(--color-action-text); font:500 var(--text-sm)/1.5 var(--font-text); resize:vertical; }
+.admin-ui--lino .lino-input:has(.lino-field-select) { height:auto; }
+.admin-ui--lino .lino-input > input[type=date], .admin-ui--lino .lino-input > input[type=time] { padding-inline:var(--space-3); }
+.admin-ui--lino .lino-input > .field-color-picker { position:absolute; left:var(--space-3); top:var(--space-2); width:var(--icon-xl); height:var(--icon-xl); padding:0; opacity:0; pointer-events:none; }
+.admin-ui--lino .lino-input > .field-color-swatch { left:var(--space-3); top:calc((var(--control-height) - var(--icon-xl))/2); }
+.admin-ui--lino .lino-input.has-color-swatch > input:not(.field-color-picker) { padding-left:calc(var(--space-3) + var(--icon-xl) + var(--space-2)); }
+.admin-ui--lino [data-slot=spinner].admin-spinner { font-size:var(--control-height-sm); vertical-align:middle; margin-inline-end:var(--space-2); }
+.admin-ui--lino .admin-switch-label { cursor:pointer; }
+.admin-ui--lino .admin-filter-toggle { --_item-h:var(--control-height-sm); --_item-fs:var(--text-sm); --_icon:var(--icon-sm); }
+.admin-ui--lino .repeat-weekdays .admin-filter-toggle { flex:1; min-width:0; padding-inline:0; }
+.admin-ui--lino .lino-input > select { width:100%; min-width:0; height:var(--control-height); padding:0 var(--space-3); border:0; background:transparent; color:var(--color-action-text); font:500 var(--text-sm)/1.2 var(--font-text); }
+.admin-ui--lino .field-select-menu { right:auto; z-index:1000; border:0; background:transparent; box-shadow:none; }
+.admin-ui--lino .field-select-option { background:transparent; }
+.admin-ui--lino .field-select-option:hover { background:transparent; }
+.admin-ui--lino .field-select-trigger { padding:0 var(--space-3); }
+.admin-ui--lino .repeat-menu[data-slot] { border:0; background:transparent; box-shadow:none; }
+.admin-ui--lino .repeat-settings { border:0; box-shadow:none; background:transparent; }
+.admin-ui--lino .lino-dialog { --admin-dialog-width:640px; --admin-dialog-pad:calc(var(--space-6) + var(--space-1)); --admin-dialog-margin:var(--space-6); width:min(calc(100% - var(--space-8)),var(--admin-dialog-width)); max-height:calc(100dvh - 2 * var(--admin-dialog-margin)); padding:var(--admin-dialog-pad); border:0; background:transparent; box-shadow:none; overflow:visible; }
+.admin-ui--lino .admin-dialog-scroll { min-height:0; min-width:0; width:100%; overflow:auto; overscroll-behavior:contain; max-height:calc(100dvh - 2 * var(--admin-dialog-margin) - 2 * var(--admin-dialog-pad)); }
+.admin-ui--lino .admin-dialog-scroll { box-sizing:border-box; width:calc(100% + 2 * var(--space-2)); margin-inline:calc(-1 * var(--space-2)); padding-inline:var(--space-2); }
+.admin-ui--lino .lino-dialog::backdrop { background:color-mix(in srgb,var(--color-background) 80%,transparent); }
+.admin-ui--lino .lino-dialog.wide-overlay { --admin-dialog-width:1040px; }
+.admin-ui--lino .lino-dialog.event-overlay { --admin-dialog-width:560px; }
+.admin-ui--lino .lino-dialog.drawer-overlay { --admin-dialog-margin:0px; top:0; bottom:0; left:auto; right:0; margin:0; height:100dvh; max-height:100dvh; }
+.admin-ui--lino .lino-dialog:has(.integration-content) { --admin-dialog-width:398px; --admin-dialog-pad:0px; padding:0; }
+.admin-ui--lino .lino-dialog .integration-content { background:transparent; }
+.admin-ui--lino .lino-dialog .editor-panel { background:transparent; padding:0; }
+.admin-ui--lino .lino-dialog:has(.event-detail:not(.confirm-delete)) { --admin-dialog-pad:0px; padding:0; }
+@media(max-width:700px){.admin-ui--lino .lino-dialog.drawer-overlay{top:auto;bottom:0;left:0;right:0;margin:auto;max-height:85dvh;width:calc(100% - var(--space-8))!important;}}

@@ -1,0 +1,95 @@
+{
+  "fileKey": "EBWvCn9vPbk5srpmyXmytQ",
+  "nodeId": "599:15335",
+  "exportedAt": "2026-11-20T12:27:25.738Z",
+  "items": [
+    {
+      "nodeId": "599:15415",
+      "name": "priests",
+      "path": "/assets/lodge-covers/priests.svg",
+      "bytes": 698753,
+      "sourceFile": "`-3.svg",
+      "sha256": "88c0eeb31f99558e954148c2dda4810ab587bebfef56d5e20e8dfff71b3e324a"
+    },
+    {
+      "nodeId": "599:15421",
+      "name": "ship",
+      "path": "/assets/lodge-covers/ship.svg",
+      "bytes": 507479,
+      "sourceFile": "`-4.svg",
+      "sha256": "caa997eead2bd042fca6c889ec4c3100b1ec1b3deb245ea793bcf1a3d8789ab6"
+    },
+    {
+      "nodeId": "599:15458",
+      "name": "students-comrades",
+      "path": "/assets/lodge-covers/students-comrades.svg",
+      "bytes": 409251,
+      "sourceFile": "`-5.svg",
+      "sha256": "817b94b252651f77aef233d1408e66341dbd67fa95a1073090324a28154442e3"
+    },
+    {
+      "nodeId": "599:15497",
+      "name": "atemporal",
+      "path": "/assets/lodge-covers/atemporal.svg",
+      "bytes": 507958,
+      "sourceFile": "`-7.svg",
+      "sha256": "bfb19570cacd7d67e5e4e4f31f076ea6fa6cf96112716e34d987044ea042467f"
+    },
+    {
+      "nodeId": "599:15520",
+      "name": "gambling",
+      "path": "/assets/lodge-covers/gambling.svg",
+      "bytes": 473532,
+      "sourceFile": "`-8.svg",
+      "sha256": "4241cf8aab2b5bf845ebbab52b06e7d6b31230e0f413355cd35cd9aa4a13641e"
+    },
+    {
+      "nodeId": "599:15541",
+      "name": "technopriests",
+      "path": "/assets/lodge-covers/technopriests.svg",
+      "bytes": 574979,
+      "sourceFile": "`-9.svg",
+      "sha256": "6840e3344946ab1704cb4cf0101a1d77c54b9ee98080bff138904081477bc8ec"
+    },
+    {
+      "nodeId": "599:15579",
+      "name": "sequencers",
+      "path": "/assets/lodge-covers/sequencers.svg",
+      "bytes": 386295,
+      "sourceFile": "`-10.svg",
+      "sha256": "cf7c77cc49474fa9efc7d2abe00f757ecf0f54d8488d0e4f228d2a055459fad3"
+    },
+    {
+      "nodeId": "599:15336",
+      "name": "ram-pelt",
+      "path": "/assets/lodge-covers/ram-pelt.svg",
+      "bytes": 851731,
+      "sourceFile": "`.svg",
+      "sha256": "0367012947f93262f84715b05e5f9f2271f06f39fcf2997ef0d4801fb245fbbd"
+    },
+    {
+      "nodeId": "599:15360",
+      "name": "amphora",
+      "path": "/assets/lodge-covers/amphora.svg",
+      "bytes": 369223,
+      "sourceFile": "`-1.svg",
+      "sha256": "728ba6402a4558ef44484a398996b91ece24c3839e48923f3a261cf86748783e"
+    },
+    {
+      "nodeId": "599:15374",
+      "name": "torch",
+      "path": "/assets/lodge-covers/torch.svg",
+      "bytes": 409366,
+      "sourceFile": "`-2.svg",
+      "sha256": "b6a67aa97f62a483fc369077b1aa6c0e44b9528fdb50a53547f6390fd8d9abcc"
+    },
+    {
+      "nodeId": "599:15478",
+      "name": "writing-tablets",
+      "path": "/assets/lodge-covers/writing-tablets.svg",
+      "bytes": 432898,
+      "sourceFile": "`-6.svg",
+      "sha256": "dace82a04368b9b714d5582ff2f25ca351a986d6a4444ea21643b9ac002a2066"
+    }
+  ]
+}

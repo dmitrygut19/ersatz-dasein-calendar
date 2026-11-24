@@ -1,0 +1,16 @@
+---
+import InputReview from '../../components/ui/InputReview.vue';
+import TypesPanel from '../../components/TypesPanel.vue';
+import { listTypes } from '../../lib/types';
+import '../../styles/tokens.css';
+import '../../styles/app.css';
+---
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Input — проверка компонента</title></head>
+<body><main>
+  <header><h1>Input</h1><p>Обычное · ошибка · отключённое. Поля можно проверить вводом и клавиатурой.</p></header>
+  <InputReview client:load/>
+  <section class="input-in-form"><h2>В существующей форме</h2><TypesPanel initialTypes={listTypes()} client:load/></section>
+  <p><a href="/admin">Вернуться в админку</a></p>
+</main></body></html>
+<style>.input-in-form { margin-block: var(--space-8); }</style>

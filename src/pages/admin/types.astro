@@ -1,0 +1,13 @@
+---
+import TypesPanel from '../../components/TypesPanel.vue';
+import { listTypes } from '../../lib/types';
+import '../../styles/tokens.css';
+import '../../styles/app.css';
+const types = listTypes();
+---
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Типы событий — локальный пример</title></head>
+<body><main>
+  <header><h1>Админка</h1><p>Локальный пример · тестовые данные</p></header>
+  <TypesPanel initialTypes={types} client:load />
+</main></body></html>

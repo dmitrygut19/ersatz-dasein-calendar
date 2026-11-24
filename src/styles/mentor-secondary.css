@@ -1,0 +1,7 @@
+/* Copied from the live mentor site service chip on 2026-11-06. */
+.services__card-list-item[data-astro-cid-mpbzu7iw]{padding:11px 15px;background:var(--white-bg-2);font-weight:700;font-size:20px;line-height:.9;letter-spacing:-.04em;color:var(--gray-text);cursor:pointer;border:none;transition:background .2s ease,color .2s ease}
+.secondary{padding:11px 15px;background:var(--white-bg-2);font-weight:700;font-size:20px;line-height:.9;letter-spacing:-.04em;color:var(--gray-text);cursor:pointer;border:none;transition:background .2s ease,color .2s ease}
+.services__card-list-item[data-astro-cid-mpbzu7iw]:hover{background:var(--white-bg);color:var(--brown-text)}
+.secondary:hover{background:var(--white-bg);color:var(--brown-text)}
+@media(max-width:576px){.services__card-list-item[data-astro-cid-mpbzu7iw]{font-size:18px}}
+@media(max-width:576px){.secondary{font-size:18px}}

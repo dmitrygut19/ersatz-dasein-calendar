@@ -1,0 +1,16 @@
+/* Copied from https://mentors.ersatz-dasein.ru/ on 2026-11-06. Original selectors/declarations preserved. */
+.app-button[data-v-4489f5d5]{position:relative;height:60px;width:100%;font-weight:700;font-size:20px;letter-spacing:-.04em;display:flex;align-items:center;justify-content:center;overflow:visible;text-decoration:none}
+.app-button--v1[data-v-4489f5d5]{background:var(--white-bg);color:var(--brown-text-2);max-width:344px}
+.app-button--v2[data-v-4489f5d5]{background:var(--brown-bg);color:var(--white-text);max-width:244px;z-index:1}
+/* Calendar cards explicitly fill their content width; original artwork stays unchanged. */
+.app-button.app-button--full-width[data-v-4489f5d5]{width:100%;max-width:none}
+.app-button__text[data-v-4489f5d5]{position:relative;z-index:2}
+.app-button__inner[data-v-4489f5d5]{height:100%;width:100%;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.app-button__border[data-v-4489f5d5]{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:calc(100% + 6px);height:calc(100% + 6px);object-fit:fill;max-width:none;z-index:2;pointer-events:none}
+.app-button--v2 .app-button__border[data-v-4489f5d5]{width:calc(100% + 7px);height:calc(100% + 7px)}
+.app-button__decor[data-v-4489f5d5]{width:60px;height:60px;position:absolute;bottom:0;z-index:1;transition-duration:var(--transition);display:block;max-width:100%;object-fit:cover}
+.app-button__decor--left[data-v-4489f5d5]{left:0}
+.app-button__decor--right[data-v-4489f5d5]{right:0}
+.app-button:hover .app-button__decor--left[data-v-4489f5d5]{transform:translate(-40%)}
+.app-button:hover .app-button__decor--right[data-v-4489f5d5]{transform:translate(30%)}
+@media(max-width:576px){.app-button--v1[data-v-4489f5d5]{max-width:none}}

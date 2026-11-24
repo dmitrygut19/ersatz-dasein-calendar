@@ -1,0 +1,24 @@
+# Render: https://render.com/docs/infrastructure-as-code
+# Free tier: no persistent disk, so the SQLite database resets on every deploy/restart.
+# Switch the service to a paid instance and re-add the disk block when real data arrives.
+services:
+  - type: web
+    name: ersatz-calendar-admin
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: node scripts/render-start.mjs
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "24.18.0"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: CALENDAR_DEMO_REMOTE
+        value: "1"
+      - key: CALENDAR_PUBLIC_DEMO
+        value: "1"
+      - key: CALENDAR_EXPERIMENT
+        value: "local"
+      - key: CALENDAR_EXPERIMENT_TOKEN
+        generateValue: true

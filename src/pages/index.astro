@@ -1,0 +1,27 @@
+---
+import { isAdmin } from '../lib/auth';
+const preview = Astro.url.searchParams.get('preview');
+const ui = Astro.url.searchParams.get('adminUi');
+const uiQuery = ui === 'classic' || ui === 'lino' ? '?adminUi=' + ui : '';
+if (isAdmin(Astro.request)) return Astro.redirect(preview === 'input' ? '/admin/input' : preview === 'badges' ? '/admin/badges' : preview === 'type-card' ? '/admin/type-card' : preview === 'event-card' ? '/admin/event-card' : preview === 'buttons' ? '/admin/buttons' : preview === 'selection-controls' ? '/admin/selection-controls' : preview === 'repeat-panels' ? '/admin/repeat-panels' : preview === 'action-icons' ? '/admin/action-icons' : preview === 'segmented-controls' ? '/admin/segmented-controls' : '/admin' + uiQuery);
+---
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"/><meta name="referrer" content="no-referrer"/><title>Локальный пример календаря</title></head>
+<body><p id="status" role="status">Открываем локальный пример…</p>
+<script is:inline>
+  (async () => {
+    const token = location.hash.slice(1);
+    const preview = new URLSearchParams(location.search).get('preview');
+    const ui = new URLSearchParams(location.search).get('adminUi');
+    const uiQuery = ui === 'classic' || ui === 'lino' ? '?adminUi=' + ui : '';
+    const destination = preview === 'input' ? '/admin/input' : preview === 'badges' ? '/admin/badges' : preview === 'type-card' ? '/admin/type-card' : preview === 'event-card' ? '/admin/event-card' : preview === 'buttons' ? '/admin/buttons' : preview === 'selection-controls' ? '/admin/selection-controls' : preview === 'repeat-panels' ? '/admin/repeat-panels' : preview === 'action-icons' ? '/admin/action-icons' : preview === 'segmented-controls' ? '/admin/segmented-controls' : '/admin';
+    history.replaceState(null, '', '/');
+    const status = document.getElementById('status');
+    if (!token) { status.textContent = 'Откройте ссылку, которую выдал локальный запуск примера.'; return; }
+    try {
+      const response = await fetch('/api/local-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
+      if (!response.ok) throw new Error('Нет тестового доступа. Откройте новую ссылку после запуска примера.');
+      location.replace(destination + uiQuery);
+    } catch (error) { status.textContent = error.message || 'Не удалось открыть пример.'; }
+  })();
+</script></body></html>

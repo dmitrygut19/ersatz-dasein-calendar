@@ -1,0 +1,11 @@
+---
+import { screens } from '../../lib/admin-demo';
+import '../../styles/tokens.css';
+import '../../styles/app.css';
+import '../../styles/admin.css';
+const preview = screens.find(screen=>screen.id === Astro.url.searchParams.get('preview'));
+const mode = Astro.url.searchParams.get('mode') === 'mobile' ? 'mobile' : 'desktop';
+---
+<!doctype html><html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Все экраны админки</title></head><body><main class="screen-catalogue"><header><h1>Все экраны админки</h1><p>Текущая сборка desktop/mobile. Внешний вид будем доводить по одному элементу.</p></header><a href="/admin">Открыть админку</a>
+{preview && <section class="admin-panel"><h2>{preview.title} · {mode === 'mobile' ? '390 px' : '1440 px'}</h2><a href={`/admin?screen=${preview.id}`}>Открыть экран отдельно</a><div class="catalogue-preview"><iframe title={`${preview.title} — ${mode}`} src={`/admin?screen=${preview.id}`} width={mode === 'mobile' ? 390 : 1440}/></div></section>}
+<div class="screens-grid">{screens.map(screen=><section class="screen-link"><span>{screen.group}</span><h2>{screen.title}</h2><a href={`/admin?screen=${screen.id}`}>Открыть</a><div class="button-row"><a href={`/admin/screens?preview=${screen.id}&mode=desktop`}>Десктоп</a><a href={`/admin/screens?preview=${screen.id}&mode=mobile`}>Мобильный</a></div></section>)}</div><p class="demo-note">Типы событий сохраняются в SQLite. Остальные данные и переходы демонстрационные; реальных интеграций нет.</p></main></body></html>

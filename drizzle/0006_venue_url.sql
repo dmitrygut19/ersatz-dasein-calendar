@@ -1,0 +1,1 @@
+ALTER TABLE event_types ADD COLUMN venue_url TEXT NOT NULL DEFAULT '';

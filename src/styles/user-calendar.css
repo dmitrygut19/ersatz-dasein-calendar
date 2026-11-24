@@ -1,0 +1,202 @@
+/* Layout from the provided calendar; controls/material/type from lino-ui 0.2.0. */
+.uc-filters{display:flex;align-items:flex-end;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);}
+.uc-filters .uc-lodges{flex:0 1 calc(var(--space-8) * 9);max-width:100%;}
+.uc-filters .segmented-control{max-width:100%;}
+.uc-filters .text-action{align-self:center;}
+.uc-result{margin:0 0 var(--space-4);font-size:var(--text-sm);}
+.uc-filters .lino-toggles{flex-wrap:nowrap;}
+.uc-filters :deep(.lino-toggles), .uc-filters :deep(.lino-input) { height:var(--control-default); }
+.uc-filters :deep(.lino-select-trigger) { min-height:var(--control-default); }
+.user-calendar--lino { padding:var(--space-10) var(--space-12) var(--space-12); min-width:0; color:var(--color-text); background:var(--color-background); font-family:var(--font-text); }
+.user-calendar--embedded { padding:0; }
+.calendar-header { margin-bottom:var(--space-8); }
+.calendar-header h1 { font:700 var(--text-xl)/1.125 var(--font-display); letter-spacing:var(--tracking-tight); }
+.calendar-header p { margin-top:var(--space-2); font:400 var(--text-xs)/1.5 var(--font-text); color:var(--color-muted); }
+.uc-bottombar { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-4); margin-bottom:var(--space-6); }
+.uc-monthrow { display:flex; align-items:center; min-width:0; gap:var(--space-6); }
+.uc-month { margin:0; color:var(--color-text); font:700 var(--text-xl)/1.125 var(--font-display); letter-spacing:var(--tracking-tight); }
+.uc-nav { display:flex; align-items:center; gap:var(--space-2); }
+.uc-nav-item { display:grid; place-items:center; width:40px; height:40px; padding:0; border:0; background:var(--white-90) url('/assets/calendar/nav-bg.png') center / 49px 49px no-repeat; cursor:pointer; }
+.uc-nav-flip { transform:scaleX(-1); }
+.uc-tg, .uc-account, .uc-degree-preview { margin-left:auto; }
+.uc-degree-preview :deep(.segmented-options) { max-width:100%; }
+.uc-degree-preview :deep(.segmented-options button) { flex-shrink:1; }
+.uc-main { display:flex; align-items:flex-start; gap:var(--space-6); }
+.uc-calendar { flex:1 1 auto; min-width:0; container-type:inline-size; }
+.uc-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:var(--space-2); }
+.uc-weekday { display:flex; align-items:center; height:var(--space-6); padding-left:var(--space-2); color:var(--color-muted); font:700 var(--text-xs)/1 var(--font-display); }
+.uc-day { position:relative; display:flex; flex-direction:column; height:clamp(var(--calendar-day-small),calc((100cqw - 6 * var(--space-2)) / 7),var(--calendar-day-large)); min-height:0; padding:2px; min-width:0; --surface-border:var(--color-border); --lino-surface:var(--event-background,var(--color-surface)); }
+.uc-day.lino-plate::after, .uc-card.lino-plate::after { background:var(--lino-surface); }
+.uc-day.uc-muted { visibility:hidden; pointer-events:none; }
+.uc-day-head { flex:none; display:flex; align-items:center; justify-content:space-between; gap:var(--space-1); min-height:var(--control-height-sm); padding:0 var(--space-1); color:var(--event-pager-color,var(--color-muted)); }
+.uc-day-number { flex:none; padding-left:var(--space-1); font:500 var(--text-sm)/1 var(--font-display); }
+.uc-pager { display:flex; align-items:center; gap:0; min-width:0; color:inherit; }
+.uc-counter { flex:none; color:inherit; font:500 var(--text-xs)/1 var(--font-display); }
+.uc-caret { display:inline-flex; align-items:center; justify-content:center; width:var(--icon-sm); height:var(--icon-sm); padding:0; border:0; background:transparent; color:var(--event-pager-muted,var(--text-secondary)); cursor:pointer; --icon-size:var(--space-3); transition:color var(--dur) var(--ease-out); }
+.uc-caret:disabled { opacity:.35; cursor:default; }
+.uc-caret:hover:not(:disabled) { color:var(--event-pager-hover,var(--copper-600)); }
+.uc-event-arrow-back { rotate:90deg; }
+.uc-event-arrow-next { rotate:-90deg; }
+.uc-event { display:flex; flex:1; flex-direction:column; min-height:0; }
+.uc-cover { display:block; flex:1; width:100%; min-height:0; border:0; padding:0; background:none; cursor:pointer; clip-path:var(--rough-clip-sm); }
+.uc-cover img { display:block; width:100%; height:100%; object-fit:cover; }
+.uc-caption { display:flex; align-items:center; flex:none; gap:var(--space-1); width:100%; min-height:var(--control-height-sm); border:0; padding:var(--space-1) var(--space-2); background:none; color:var(--event-text,var(--color-text)); text-align:left; cursor:pointer; }
+.uc-time { flex:none; font:500 var(--text-sm)/1.25 var(--font-display); }
+.uc-title { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font:400 var(--text-xs)/1.4 var(--font-text); }
+.uc-mobile-events { display:none; }
+.uc-venue { display:none; }
+.uc-poster-time { display:none; }
+/* Highlight the current number without widening the day header. */
+@media (min-width:701px) {
+  .uc-date-today { color:var(--copper-600); font-weight:800; text-decoration:underline; text-underline-offset:var(--space-1); }
+}
+/* Compact bounded cells; long titles continue in the detail card. */
+@media (min-width:701px) {
+  .uc-venue { position:relative; z-index:3; display:flex; flex:none; min-width:0; padding:0 var(--space-2) var(--space-1); color:var(--event-text,var(--color-text)); }
+  .uc-venue-link, .uc-venue-label { display:inline-flex; align-items:center; min-width:0; max-width:100%; gap:var(--space-1); min-height:var(--space-6); font:500 var(--text-xs)/1 var(--font-display); color:inherit; --icon-size:var(--space-3); }
+  .uc-venue-link { text-decoration:underline; text-underline-offset:var(--space-1); }
+  .uc-venue-link:hover { text-decoration-thickness:var(--textured-control); }
+  .uc-venue-link:focus-visible { outline:var(--focus-ring); outline-offset:var(--focus-offset); }
+  .uc-venue-link > span, .uc-venue-label > span { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .uc-venue img { display:block; width:var(--icon-sm); height:var(--icon-sm); flex:none; object-fit:contain; }
+  .uc-day-illustration .uc-day-head, .uc-day-artwork .uc-day-head { min-height:var(--space-6); position:relative; z-index:3; color:var(--event-text,var(--color-text)); flex-wrap:wrap; }
+  .uc-day-illustration .uc-pager, .uc-day-artwork .uc-pager { margin-left:auto; }
+  .uc-day-illustration .uc-poster-time, .uc-day-artwork .uc-poster-time { display:inline; font:500 var(--text-xs)/1 var(--font-display); }
+  .uc-day-illustration .uc-cover { position:relative; margin:var(--space-1); width:calc(100% - var(--space-2)); clip-path:none; overflow:visible; }
+  .uc-day-illustration .uc-cover img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none; }
+  .uc-day-illustration .uc-caption, .uc-day-artwork .uc-caption { position:relative; z-index:3; min-height:var(--control-height); align-items:flex-end; padding:var(--space-1) var(--space-2) var(--space-2); }
+  .uc-day-illustration .uc-time, .uc-day-artwork .uc-time { display:none; }
+  .uc-day-illustration .uc-title, .uc-day-artwork .uc-title { white-space:normal; overflow-wrap:anywhere; font:700 var(--text-sm)/1.1 var(--font-display); display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; }
+  .uc-day-artwork { overflow:visible; }
+  .uc-day-artwork .uc-cover { position:absolute; inset:0; width:100%; height:100%; clip-path:none; }
+  .uc-day-artwork .uc-caption { margin-top:auto; }
+}
+/* Preferred 5:6 ratio, with the user's approved content minimum on narrow cells.
+   The same minimum applies to empty days and every event/pager state. */
+.user-calendar--public {
+  --calendar-illustration-width:var(--event-cover-width);
+  --calendar-illustration-height:calc(var(--calendar-illustration-width) * 3 / 4);
+  --calendar-cell-header-reserve:var(--space-12);
+  --calendar-cell-content-min:calc(2 * var(--calendar-cell-inset) + var(--calendar-cell-header-reserve) + var(--calendar-illustration-height) + var(--space-2) + 3 * var(--text-sm) * 1.1 + var(--space-2) + var(--space-6));
+}
+.user-calendar--public .uc-day { width:100%; height:auto; aspect-ratio:5 / 6; min-height:var(--calendar-cell-content-min); max-height:none; }
+@media (min-width:701px) {
+  .user-calendar--public .uc-day { padding:var(--calendar-cell-inset); }
+  .user-calendar--public .uc-day-head { padding:0; min-height:var(--space-6); align-items:flex-start; justify-content:flex-start; flex-wrap:wrap; gap:var(--space-2) 0; }
+  .user-calendar--public .uc-day-number { padding:0; margin-right:var(--space-1); min-width:0; max-width:100%; flex:0 1 auto; font:500 var(--text-xs)/1 var(--font-display); color:inherit; }
+  .user-calendar--public .uc-date { display:block; }
+  .user-calendar--public .uc-pager { margin-left:auto; flex:none; }
+  .user-calendar--public .uc-poster-time { display:block; flex:none; font:500 var(--text-xs)/1 var(--font-display); color:inherit; }
+  /* Fill the whole day beneath the controls; retain its textured inner contour. */
+  /* n-slice paths are expressed relative to the negative-bleed layer origin.
+     Match that origin exactly: the image's inner contour meets the outer frame. */
+  .user-calendar--public .uc-day .uc-cover:has(img) { position:absolute; inset:calc(-1 * var(--cut-bleed,0px)); z-index:0; display:block; width:calc(100% + 2 * var(--cut-bleed,0px)); height:calc(100% + 2 * var(--cut-bleed,0px)); min-height:0; max-height:none; margin:0; padding:0; aspect-ratio:auto; clip-path:var(--cut-1); overflow:hidden; }
+  .user-calendar--public .uc-day:has(.uc-cover img)::after,
+  .user-calendar--public .uc-day:has(.uc-cover img) > :deep(.lino-surface-edge) { display:none; }
+  .user-calendar--public .uc-day .uc-cover img { position:absolute; inset:0; margin:0; width:100%; height:100%; max-width:none; max-height:none; object-fit:cover; pointer-events:none; }
+  .user-calendar--public .uc-day:has(.uc-cover img) .uc-caption { margin-top:auto; }
+  /* Faint, continuously fading brown shades follow the actual text height. */
+  .user-calendar--public .uc-day:has(.uc-cover img) {
+    padding:max(var(--calendar-cell-inset),var(--space-2));
+    --event-text:var(--cream-50) !important;
+    --event-pager-color:var(--cream-50) !important;
+    --event-pager-muted:var(--cream-50) !important;
+    --event-pager-hover:var(--cream-50) !important;
+  }
+  .user-calendar--public .uc-day .uc-cover:has(img)::before,
+  .user-calendar--public .uc-day .uc-cover:has(img)::after {
+    content:''; position:absolute; inset-inline:0; z-index:1; pointer-events:none;
+    background:linear-gradient(var(--calendar-cover-shade-direction),color-mix(in srgb,var(--brown-900) 38%,transparent),color-mix(in srgb,var(--brown-900) 22%,transparent) 40%,color-mix(in srgb,var(--brown-900) 7%,transparent) 75%,transparent);
+  }
+  .user-calendar--public .uc-day .uc-cover:has(img)::before { top:0; height:calc(var(--cover-header-height,var(--space-8)) + var(--space-4)); --calendar-cover-shade-direction:to bottom; }
+  .user-calendar--public .uc-day .uc-cover:has(img)::after { bottom:0; height:calc(var(--cover-footer-height,var(--space-8)) + var(--space-4)); --calendar-cover-shade-direction:to top; }
+  .user-calendar--public .uc-day:has(.uc-cover img) :is(.uc-day-head,.uc-caption,.uc-venue) { text-shadow:0 1px var(--space-1) color-mix(in srgb,var(--brown-900) 85%,transparent); }
+  .user-calendar--public .uc-day:has(.uc-cover img) .uc-caret svg { filter:drop-shadow(0 1px 2px var(--brown-900)); }
+  .user-calendar--public .uc-day:has(.uc-cover img) .uc-title { font-weight:var(--font-weight-semibold); }
+  .user-calendar--public .uc-day:has(.uc-cover img) .uc-date-today { color:var(--cream-50); }
+  .user-calendar--public .uc-day:has(.uc-cover img) .uc-caret:disabled { opacity:.65; }
+  .user-calendar--public .uc-caption { min-height:0; padding:0; }
+  .user-calendar--public .uc-venue { padding:0; margin-top:var(--space-1); }
+  .user-calendar--public .uc-venue-link, .user-calendar--public .uc-venue-label { min-height:var(--space-4); }
+}
+/* 720 = seven 96px cells (72px illustration + two 12px text insets), six 8px gaps. */
+@container (max-width:720px) {
+  .user-calendar--public .uc-day { --calendar-cell-header-reserve:var(--space-16); --calendar-cell-inset:var(--space-1); }
+  .user-calendar--public .uc-caret { width:var(--space-3); }
+}
+.uc-open { display:none; }
+.uc-panel { flex:0 0 339px; width:339px; min-width:0; margin-top:calc(var(--space-6) + var(--space-2)); display:none; }
+.uc-panel-open { display:block; }
+.uc-panel-scroll { padding:var(--space-1); margin:calc(-1 * var(--space-1)); }
+@media (min-width:901px) {
+  .uc-panel { align-self:stretch; margin-top:0; padding-top:var(--panel-offset,0px); box-sizing:border-box; }
+  .uc-panel-sticky .uc-panel-scroll { position:relative; transform:translateY(var(--panel-shift,0px)); }
+}
+.uc-card { position:relative; display:flex; flex-direction:column; width:326px; padding:2px; --surface-border:var(--event-border,var(--color-border)); --lino-surface:var(--event-background,var(--color-surface)); color:var(--event-text,var(--color-text)); animation:uc-card-in var(--dur) var(--ease-out); }
+.uc-card-cover { position:relative; }
+.uc-card-cover img { display:block; width:100%; height:239px; object-fit:cover; clip-path:var(--rough-clip-sm); }
+.uc-card-illustration .uc-card-cover img { object-fit:cover; padding:0; clip-path:none; }
+.uc-card-cover.uc-no-cover { min-height:var(--control-height); }
+.uc-card-close { position:absolute; top:4px; right:10px; z-index:3; padding:4px 6px; border:0; border-radius:0; background:transparent; color:var(--text-primary); font-size:24px; line-height:1; cursor:pointer; }
+.uc-card-close.uc-close-light { color:var(--white-100); }
+.uc-card-badge.lino-tag { position:absolute; top:var(--space-2); left:var(--space-2); max-width:calc(100% - var(--control-height-sm) - var(--space-6)); height:auto; min-height:var(--control-height-sm); white-space:normal; overflow-wrap:anywhere; gap:var(--space-1); --tag-size:var(--text-xs); --icon-size:var(--text-xs); }
+.uc-badge-closed { --tier-ink:var(--color-text); }
+.uc-card-body { display:flex; flex-direction:column; gap:var(--space-4); padding:var(--space-4); min-width:0; }
+.uc-card-name { margin:0; color:var(--event-accent,var(--color-text)); font:700 var(--text-lg)/1.15 var(--font-display); letter-spacing:var(--tracking-tight); overflow-wrap:anywhere; }
+.uc-card-date { margin:0; color:inherit; font:500 var(--text-md)/1.25 var(--font-display); letter-spacing:var(--tracking-tight); }
+.uc-card-info { display:flex; flex-direction:column; gap:var(--space-2); }
+.uc-info-row { display:flex; align-items:flex-start; gap:var(--space-2); margin:0; color:inherit; font:400 var(--text-xs)/1.5 var(--font-text); --icon-size:var(--text-sm); }
+.uc-info-row :deep(.lino-glyph) { margin-top:var(--space-1); }
+.uc-card-desc { margin:0; color:inherit; font:400 var(--text-sm)/1.5 var(--font-text); white-space:pre-wrap; overflow-wrap:anywhere; }
+.uc-card-pager { display:none; }
+.uc-access { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3); --surface-bg:var(--color-action-background); --surface-border:var(--color-border-strong); color:var(--color-text); }
+.uc-access-title { font:700 var(--text-sm)/1.25 var(--font-display); }
+.uc-card-btn, .uc-calendar-add { white-space:normal; }
+.uc-card-btn:disabled :deep(.app-button__decor), .uc-tg:disabled :deep(.app-button__decor) { transform:none; }
+.uc-link-note, .uc-preview-note { margin:0; font:400 var(--text-xs)/1.5 var(--font-text); }
+.uc-preview-note { margin-bottom:var(--space-4); color:var(--color-muted); }
+.uc-degree-preview { display:flex; align-items:center; gap:var(--space-1); }
+.uc-account { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-3); padding:var(--space-2); --surface-bg:var(--color-surface); --surface-border:var(--color-border); color:var(--color-text); font:400 var(--text-xs)/1.4 var(--font-text); }
+.uc-avatar { display:grid; place-items:center; width:var(--control-height); height:var(--control-height); flex:none; background:var(--tier-0-bg); clip-path:var(--rough-clip-sm); color:var(--color-text); font:700 var(--text-md)/1 var(--font-display); }
+.uc-degree { padding:var(--space-2); --surface-bg:var(--tier-bg); --surface-border:var(--tier-frame); color:var(--tier-ink); font:700 var(--text-xs)/1 var(--font-display); }
+.uc-feedback, .uc-notice { --surface-bg:var(--color-surface); --surface-border:var(--color-border); padding:var(--space-4); color:var(--color-text); font:400 var(--text-xs)/1.5 var(--font-text); }
+.uc-feedback { margin-bottom:var(--space-4); }
+.uc-notice { position:fixed; z-index:20; bottom:var(--space-4); right:var(--space-4); max-width:min(480px,calc(100% - var(--space-8))); }
+[role=group] { --press-whole:1; --press-content:var(--press); }
+.uc-cover:focus-visible, .uc-caption:focus-visible, .uc-open:focus-visible { outline:var(--focus-ring); outline-offset:var(--focus-offset); }
+.uc-cover, .uc-caption, .uc-open { -webkit-tap-highlight-color:transparent; }
+@media (hover:hover) { .uc-day:hover { --surface-border:var(--copper-600); } }
+.uc-day.uc-selected { --surface-border:var(--copper-600); }
+@media (hover:none) { .uc-day.lino-plate::before { background:var(--color-border); transition:none; } }
+@media (hover:none) { .uc-day.uc-selected.lino-plate::before { background:var(--copper-600); } }
+@container (max-width:1000px) { .uc-day { max-height:var(--calendar-day-medium); } }
+@media (max-width:900px) { .uc-main { flex-wrap:wrap; } .uc-calendar { flex-basis:100%; } .uc-panel { flex-basis:100%; width:100%; margin-top:0; } }
+@media (max-width:700px) {
+  .user-calendar--lino { padding:var(--space-6) var(--space-3); }
+  .user-calendar--embedded { padding:0; }
+  .calendar-header { display:none; }
+  .uc-bottombar { flex-direction:column; align-items:stretch; gap:var(--space-4); margin-bottom:var(--space-4); }
+  .uc-monthrow { justify-content:space-between; gap:var(--space-2); }
+  .uc-month { font-size:var(--text-xl); }
+  .uc-nav { gap:var(--space-1); }
+  .uc-tg, .uc-account, .uc-degree-preview { margin-left:0; width:100%; }
+  .uc-grid { gap:var(--space-1); }
+  .uc-weekday { height:var(--space-4); padding-left:var(--space-1); }
+  .uc-day { height:var(--space-32); min-height:var(--space-32); max-height:var(--space-32); --lino-surface:var(--color-surface); }
+  .user-calendar--public .uc-day { height:auto; min-height:var(--space-32); max-height:none; }
+  .uc-day-head { min-height:0; padding:var(--space-1); color:var(--color-text); }
+  .uc-day-number { padding-left:0; }
+  .uc-event, .uc-pager { display:none; }
+  .uc-mobile-events { display:flex; flex-direction:column; gap:var(--space-1); min-width:0; padding:0 var(--space-1) var(--space-1); pointer-events:none; }
+  .uc-mobile-event { display:block; flex:none; height:var(--space-5); min-width:0; padding:0 var(--space-1); --surface-bg:var(--event-chip-background,var(--color-action-background)); --surface-border:var(--event-accent,var(--color-border)); color:var(--event-text,var(--color-text)); font:500 var(--text-xs)/var(--space-5) var(--font-display); }
+  .uc-mobile-event > span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .uc-open { display:block; position:absolute; inset:0; width:100%; height:100%; border:0; padding:0; background:none; cursor:pointer; }
+  .uc-card-pager { display:flex; justify-content:space-between; align-items:center; color:inherit; }
+  .uc-card-pager .uc-caret { display:grid; place-items:center; width:32px; height:32px; color:var(--event-card-pager-muted,var(--text-secondary)); }
+  .uc-card-pager .uc-caret:hover:not(:disabled) { color:var(--event-card-pager-hover,var(--copper-600)); }
+  .uc-card-pager .uc-caret:disabled { opacity:.35; }
+  .uc-card { width:100%; }
+  .uc-card-cover img { height:239px; }
+}
+@keyframes uc-card-in { from { opacity:0; translate:0 var(--space-1); } to { opacity:1; translate:0 0; } }
+@media (prefers-reduced-motion:reduce) { .uc-card { animation:none; } .uc-caret, .uc-card-btn :deep(.app-button__decor), .uc-tg :deep(.app-button__decor) { transition:none; } }

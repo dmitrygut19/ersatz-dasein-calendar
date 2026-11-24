@@ -1,0 +1,20 @@
+/* Vue bridge to the installed lino n-slice surfaces; limited to changed admin blocks. */
+.admin-event-lino.lino-plate { position:relative; isolation:isolate; --surface-bg:var(--bg-surface); --surface-border:var(--border-texture); background:transparent; }
+.admin-event-lino.lino-plate::before, .admin-event-lino.lino-plate::after { content:''; position:absolute; inset:calc(-1 * var(--cut-bleed,0px)); z-index:-1; pointer-events:none; border:0; border-image:none; }
+.admin-event-lino.lino-plate::before { background:var(--surface-border); clip-path:var(--cut-0,inset(50%)); }
+.admin-event-lino.lino-plate::after { background:var(--surface-bg); clip-path:var(--cut-1,inset(50%)); }
+.admin-overlay:has(.admin-event-lino) { background:transparent; box-shadow:none; padding:0; }
+.admin-event-lino .event-title, .admin-event-lino .demo-note { overflow-wrap:anywhere; }
+.user-calendar .uc-admin-create { position:absolute; inset:var(--space-2); top:var(--space-8); display:grid; place-items:center; color:var(--text-secondary); font:inherit; font-size:var(--input-helper-size); overflow-wrap:anywhere; opacity:0; }
+.user-calendar .uc-admin-empty { position:absolute; inset:0; border:0; background:transparent; cursor:pointer; }
+.uc-admin-empty:hover .uc-admin-create, .uc-admin-empty:focus-visible .uc-admin-create { opacity:1; }
+.uc-admin-empty:focus-visible { outline:var(--space-1) solid var(--accent); }
+@media (hover:none) { .uc-admin-empty .uc-admin-create { opacity:1; } }
+.user-calendar--embedded .uc-grid-compact .uc-admin-create { inset:0; opacity:1; font-size:var(--heading-sm-size); overflow-wrap:normal; }
+.uc-admin-day { display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-3); padding:var(--space-4) 0; }
+.uc-admin-day p { margin:0; }
+/* All event artwork fills its assigned rectangle. Keep this rule shared across
+   lists, type cards, editors, galleries, detail dialogs and embedded previews. */
+.admin-shell :is(img[src^="/assets/lodge-covers/"],img.cover,img.list-cover,img.event-hero,.editor-cover > img,.cover-option > img,.preview-cell > img,.preview-event > img,.figma-card-cover > img,.uc-cover > img) { object-fit:cover !important; padding:0; border-radius:0; }
+.admin-shell img:is(.list-cover,.cover,.event-hero) { display:block; }
+.uc-admin-day .text-action { text-align:left; overflow-wrap:anywhere; }

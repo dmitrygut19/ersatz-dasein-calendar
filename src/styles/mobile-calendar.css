@@ -1,0 +1,20 @@
+﻿/* Public mobile: text month grid with modal details. */
+.uc-inline-pager{position:relative;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-1) var(--space-4);color:var(--text-primary);background:var(--bg-canvas);}
+.uc-inline-pager .uc-caret{width:var(--control-compact);height:var(--control-compact);color:var(--text-primary);}
+.uc-sheet-navigation .uc-counter{font-size:var(--calendar-day-mobile-size);line-height:var(--space-5);}
+.uc-inline-pager .uc-caret:focus-visible{outline:var(--focus-ring);outline-offset:var(--focus-offset);}
+.uc-grid-compact .uc-day{aspect-ratio:auto;height:var(--space-24);min-height:var(--space-24);max-height:var(--space-24);padding:var(--space-1) 0;gap:var(--space-1);align-items:stretch;--lino-surface:var(--color-surface);overflow:visible;}
+.uc-compact-date{display:block;flex:none;height:var(--space-5);padding:0 var(--space-1);font:500 var(--calendar-day-mobile-size)/var(--space-5) var(--font-display);pointer-events:none;}
+.uc-compact-today{color:var(--copper-600);font-weight:800;text-decoration:underline;text-underline-offset:var(--space-1);}
+.uc-cell-events{display:flex;flex-direction:column;gap:var(--space-1);min-width:0;pointer-events:none;}
+.uc-cell-event{display:block;min-width:0;}
+.uc-cell-label{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 calc(var(--space-1) / 2);height:var(--space-4);background:color-mix(in srgb,var(--event-accent,var(--copper-600)) 14%,var(--color-surface));color:var(--text-primary);font:500 var(--calendar-weekday-mobile-size)/var(--space-4) var(--font-body-family);}
+.uc-cell-more{font:500 var(--calendar-weekday-mobile-size)/var(--space-4) var(--font-display);padding:0 var(--space-1);}
+.user-calendar--public .uc-grid-compact .uc-cell-label{background:color-mix(in srgb,var(--mobile-event-accent,var(--copper-600)) 22%,var(--color-surface));}
+.uc-date-button{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer;}
+.uc-date-button:focus-visible{outline:var(--focus-ring);outline-offset:calc(-1 * var(--focus-offset));}
+@media(max-width:700px){
+ .user-calendar--public .uc-filters{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-4);margin-bottom:var(--space-4);}
+ .user-calendar--public .uc-filters .uc-lodges{width:100%;}
+ .uc-grid-compact .uc-weekday{justify-content:center;padding:0;height:var(--space-6);}
+}

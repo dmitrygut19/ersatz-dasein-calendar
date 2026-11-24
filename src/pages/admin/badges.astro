@@ -1,0 +1,20 @@
+---
+import AccessBadge from '../../components/ui/AccessBadge.vue';
+import '../../styles/tokens.css';
+import '../../styles/app.css';
+---
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Бейджи — проверка компонента</title></head>
+<body><main>
+  <header><h1>Бейджи</h1><p>Два варианта из Figma с ручными экспортами рамок.</p></header>
+  <div class="badge-reference" aria-label="Бейджи из Figma"><AccessBadge>ТЕКСТ</AccessBadge><AccessBadge variant="error">ТЕКСТ</AccessBadge></div>
+  <section class="badge-context"><h2>Варианты доступа</h2><div class="badge-examples"><AccessBadge>Открыто</AccessBadge><AccessBadge variant="error">Закрыто</AccessBadge></div></section>
+  <p><a href="/admin">Посмотреть в админке</a> · <a href="/admin/input">Инпуты</a></p>
+</main></body></html>
+<style>
+.badge-reference { position: relative; width: 200px; height: 72px; background: #e9e9e9; }
+.badge-reference :global(.access-badge) { position: absolute; top: 20px; left: 20px; }
+.badge-reference :global(.access-badge[data-variant='error']) { left: 113px; }
+.badge-context { margin-block: var(--space-8); }
+.badge-examples { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); margin-top: var(--space-4); }
+</style>

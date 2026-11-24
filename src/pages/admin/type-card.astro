@@ -1,0 +1,13 @@
+---
+import TypeCardReview from '../../components/ui/TypeCardReview.vue';
+import '../../styles/tokens.css';
+import '../../styles/app.css';
+---
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Type card — проверка компонента</title></head>
+<body><main>
+  <header><h1>Type card</h1><p>Открытая и закрытая карточки · desktop и mobile.</p></header>
+  <TypeCardReview client:load/>
+  <p class="type-card-links"><a href="/admin">Админка</a> · <a href="/admin/input">Инпуты</a> · <a href="/admin/badges">Бейджи</a></p>
+</main></body></html>
+<style>.type-card-links { margin-top: var(--space-8); }</style>

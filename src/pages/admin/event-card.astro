@@ -1,0 +1,16 @@
+---
+import EventCardReview from '../../components/ui/EventCardReview.vue';
+import TypesPanel from '../../components/TypesPanel.vue';
+import { listTypes } from '../../lib/types';
+import '../../styles/tokens.css';
+import '../../styles/app.css';
+---
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Event card — проверка компонента</title></head>
+<body><main>
+  <header><h1>Event card</h1><p>Образец из Figma и компонент в рабочем списке типов.</p></header>
+  <EventCardReview client:load/>
+  <section class="event-card-in-context"><h2>В существующем списке</h2><TypesPanel initialTypes={listTypes()} client:load/></section>
+  <p><a href="/admin">Админка</a> · <a href="/admin/type-card">Type card</a> · <a href="/admin/badges">Бейджи</a></p>
+</main></body></html>
+<style>.event-card-in-context { margin-block: var(--space-8); }</style>

@@ -1,0 +1,324 @@
+/* Generated from lino-ui 0.2.0 by scripts/generate-lino-kit.mjs. */
+/* Design tokens (from ersatz_linktree src/styles/tokens.css + global.css). Colors are written in hsl.
+   Only base values are tokens; hover / pressed / tint shades are derived where they are used, with color-mix(). */
+
+@font-face { font-family: 'Alegreya Sans SC'; font-style: normal; font-display: swap; font-weight: 500;
+  src: url('/assets/lino/fonts/alegreya-sans-sc-cyrillic-500-normal.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Alegreya Sans SC'; font-style: normal; font-display: swap; font-weight: 500;
+  src: url('/assets/lino/fonts/alegreya-sans-sc-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Alegreya Sans SC'; font-style: normal; font-display: swap; font-weight: 700;
+  src: url('/assets/lino/fonts/alegreya-sans-sc-cyrillic-700-normal.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Alegreya Sans SC'; font-style: normal; font-display: swap; font-weight: 700;
+  src: url('/assets/lino/fonts/alegreya-sans-sc-latin-700-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Alegreya Sans SC'; font-style: normal; font-display: swap; font-weight: 800;
+  src: url('/assets/lino/fonts/alegreya-sans-sc-cyrillic-800-normal.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Alegreya Sans SC'; font-style: normal; font-display: swap; font-weight: 800;
+  src: url('/assets/lino/fonts/alegreya-sans-sc-latin-800-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Inter'; font-style: normal; font-display: swap; font-weight: 100 900; /* variable: every weight */
+  src: url('/assets/lino/fonts/inter-cyrillic-wght-normal.woff2') format('woff2-variations'), url('/assets/lino/fonts/inter-cyrillic-wght-normal.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Inter'; font-style: normal; font-display: swap; font-weight: 100 900; /* variable: every weight */
+  src: url('/assets/lino/fonts/inter-latin-wght-normal.woff2') format('woff2-variations'), url('/assets/lino/fonts/inter-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+/* the map's title face (Figma: Insignia 1073:9386; src/app/map/title.js, the ornament demo) */
+@font-face { font-family: 'TD Volshebstvo'; font-style: normal; font-weight: 400; font-display: block;
+  src: url('/assets/lino/fonts/td-volshebstvo.woff2') format('woff2'); }
+/* metric-matched stand-in until the display face arrives */
+@font-face { font-family: 'Alegreya Sans SC Fallback'; src: local('Arial'); size-adjust: 90.7%;
+  ascent-override: 99.2%; descent-override: 33.1%; line-gap-override: 0%; }
+
+
+.user-calendar--lino {
+  /* color */
+  --color-background: hsl(50 20% 94.1%);       /* paper: page and canvas */
+  --color-text: hsl(0 13.2% 14.9%);            /* ink */
+  --color-surface: hsl(0 0% 100%);             /* menus, panels */
+  --color-action-background: hsl(40 20% 97.1%);
+  --color-action-text: hsl(30 2.4% 16.1%);
+  --color-accent: hsl(21.5 100% 58.4%);        /* boosty orange: focus ring, selection, primary */
+  --color-highlight: hsl(42.6 93.2% 53.5%);    /* video action */
+  --color-muted: hsl(24 12.1% 58%);             /* captions, secondary text */
+  --color-link: hsl(21.9 61.8% 33.9%);
+  --color-divider: hsl(50 12.5% 90.6%);
+  /* borders: a warm beige (Figma #dfd8cd family), tuned with three knobs. --color-border is for panels on white
+     or paper, --color-border-strong for controls that sit on a tinted fill (the Insignia block's chips) */
+  --border-hue: 36;
+  --border-saturation: 20%;
+  --border-lightness: 84%;
+  --border-lightness-strong: 80%;
+  --color-border: hsl(var(--border-hue) var(--border-saturation) var(--border-lightness));
+  --color-border-strong: hsl(var(--border-hue) var(--border-saturation) var(--border-lightness-strong));
+  /* card palette */
+  --color-rust: hsl(19.6 56% 31.2%);
+  --color-wine: hsl(0 37% 35.5%);
+  --color-amber: hsl(38 92.3% 45.7%);
+  --color-teal: hsl(184.5 75% 31.4%);
+  --color-night: hsl(214.8 58.5% 10.4%);
+  --color-sky: hsl(213.3 79.7% 72.9%);
+  /* tiers: each one's plate, frame and name, as its plaque has them (src/ds/tier.js); the kit lays them out by
+     data-tier (src/lib/lino.css) */
+  --tier-0-bg: hsl(49 18% 88%);
+  --tier-0-frame: hsl(36.4 11.7% 52.9%);
+  --tier-0-ink: hsl(36.3 20.4% 41.4%);
+  --tier-1-bg: hsl(22.9 96.9% 37.6%);
+  --tier-1-frame: hsl(30 56% 9.8%);
+  --tier-1-ink: hsl(0 0% 100%);
+  --tier-2-bg: hsl(38 96.2% 58.8%);
+  --tier-2-frame: hsl(30 56% 9.8%);
+  --tier-2-ink: hsl(30 56% 9.8%);
+  /* the overview map's chrome (Figma: Insignia 1071:4707): its buttons on the map's paper, the title's two reds */
+  --map-paper: hsl(49.1 18% 88%);              /* #e6e4db: the map's paper */
+  --map-line: hsl(38.2 15.9% 72.9%);           /* #c5bdaf: a map button's border */
+  --map-ink: hsl(30 10% 56.9%);                /* #9c9186: a map button's glyph */
+  --map-title: hsl(18.5 100% 42%);             /* #d64200: the title's letters' outline */
+  --map-title-back: hsl(10.8 100% 26.1%);      /* #851800: the title's backing, inside the letters too */
+
+  /* canvas (read by the WebGL renderer through src/ds/tokens.js) */
+  --canvas-background: var(--color-background);
+  --canvas-dot: hsl(0 13.2% 14.9% / 6%);
+  --canvas-dot-radius: 1.75px;                 /* screen px at any zoom */
+  --canvas-block: hsl(42 16.7% 88.2%);
+  --canvas-ink: hsl(38 16.9% 37.3%);           /* ink on a canvas block: the web window's title and bar icons (Figma #6f634f) */
+  --canvas-selection: var(--color-accent);
+
+  /* type */
+  --font-display: 'Alegreya Sans SC', 'Alegreya Sans SC Fallback', sans-serif;
+  --font-text: Inter, system-ui, sans-serif;
+  --font-mono: ui-monospace, Menlo, monospace;
+  --text-xs: 14px;
+  --text-sm: 16px;
+  --text-md: 20px;
+  --text-lg: 24px;
+  --text-xl: 32px;
+  --text-2xl: 56px;
+  --tracking-tight: -.02em;
+  --tracking-tighter: -.04em;
+
+  /* space (4px steps) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* shape: square corners everywhere; surfaces get rough edges instead (src/ds/rough.js, --rough-clip). No elevation:
+     surfaces separate from the paper by fill and their rough edge */
+  /* icons (src/ds/PRINCIPLES.md, Icons): every glyph is cut at one weight, a stroke of --icon-base of its longer side
+     (2.5 on the tools row's glyphs, 27.5 on average: Figma 886:4455); where it is drawn it gains a stroke in
+     currentColor up to the stem of the type it stands with. The stems are Alegreya Sans SC's, measured on its I at 1000px */
+  --icon-base: .09;
+  --stem-500: .096em;
+  --stem-700: .127em;
+  --stem-800: .152em;
+  --stem-alone: 2.5px;                         /* a glyph with no type near: the tools bar, the profile and map buttons */
+  --icon-sm: 20px;                             /* a glyph alone on a 32px control */
+  --icon-md: 24px;                             /* on a 40px control */
+  --icon-lg: 26px;                             /* on a 56px tile (Figma's 24px chevron there, with its stroke) */
+  --icon-stroke: .05em;                        /* the lino-* elements' own, from before (src/ds/components) */
+  --control-height: 40px;
+  --control-height-sm: 32px;
+
+  /* motion */
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --dur-fast: .12s;
+  --dur: .2s;
+
+  --focus-ring: 3px solid var(--color-accent);
+  --focus-offset: 2px;
+
+  /* press (src/ds/PRINCIPLES.md, Motion): every button shrinks by --press while held. Alone it shrinks whole; one of a
+     set keeps its plate still and shrinks only its content (the icon, and the label beside it), so the row never
+     twitches. A button reads both scales below; a set swaps them for everything inside it */
+  --press: .96;
+  --press-whole: var(--press);
+  --press-content: 1;
+}
+@scope (.user-calendar--lino) {
+/* lino's look on the shadcn-svelte components. Unlayered, so it beats their Tailwind classes whatever they say. Every
+   surface follows src/ds/PRINCIPLES.md: hand-cut (src/ds/rough.js) on layers behind the content, never a border,
+   radius or shadow. A trigger's slot name may be its menu's or tooltip's, so buttons and tools go by class. */
+
+/* ---------- plate: an n-slice outline cut by the UI noise (src/lib/cut.js), for the big surfaces (menus, dialogs,
+   toolbars, fields, tooltips), where a rough polygon's few long bends would read straight. --surface-border on the
+   outline (none unless set), --surface-bg 2px in, both on layers behind the content ---------- */
+.lino-plate { position: relative; isolation: isolate; --surface-border: transparent; } /* a border only where a surface sets one: it would inherit its parent's */
+.lino-plate::before, .lino-plate::after { content: ''; position: absolute; inset: calc(-1 * var(--cut-bleed, 0px)); z-index: -1; pointer-events: none; }
+.lino-plate::before { background: var(--surface-border); clip-path: var(--cut-0, inset(50%)); transition: --surface-border var(--dur) var(--ease-out); }
+.lino-plate::after { background: var(--surface-bg); clip-path: var(--cut-1, inset(50%)); transition: --surface-bg var(--dur) var(--ease-out); }
+
+/* ---------- tiers: a tier's colours on whatever shows it (a tag, a picture's frame, a plaque): plate, frame, name, and
+   the accent a picture's frame takes ---------- */
+:where([data-tier="0"]) { --tier-bg: var(--tier-0-bg); --tier-frame: var(--tier-0-frame); --tier-ink: var(--tier-0-ink); --tier-accent: var(--tier-0-frame); }
+:where([data-tier="1"]) { --tier-bg: var(--tier-1-bg); --tier-frame: var(--tier-1-frame); --tier-ink: var(--tier-1-ink); --tier-accent: var(--tier-1-bg); }
+:where([data-tier="2"]) { --tier-bg: var(--tier-2-bg); --tier-frame: var(--tier-2-frame); --tier-ink: var(--tier-2-ink); --tier-accent: var(--tier-2-bg); }
+
+/* ---------- button ---------- */
+.lino-btn { --_h: var(--control-height); --_bg: var(--color-action-background); --_fg: var(--color-action-text);
+  --_bg-h: color-mix(in srgb, var(--_bg), var(--color-text) 8%); --_bg-p: color-mix(in srgb, var(--_bg), var(--color-text) 12%);
+  --surface-bg: var(--_bg); position: relative; isolation: isolate; box-sizing: border-box; display: inline-flex; flex: none;
+  align-items: center; justify-content: center; gap: var(--space-3); min-height: var(--_h); margin: 0; padding: 0 15px;
+  border: 0; border-radius: 0; background: none; box-shadow: none; appearance: none; color: var(--_fg);
+  font: 700 var(--text-md)/.9 var(--font-display); letter-spacing: var(--tracking-tighter); white-space: nowrap;
+  cursor: pointer; user-select: none; -webkit-user-select: none; text-decoration: none;
+  transition: --surface-bg var(--dur) var(--ease-out), color var(--dur) var(--ease-out), opacity var(--dur) var(--ease-out), transform var(--dur) var(--ease-out); }
+.lino-btn::before, .lino-btn::after { content: ''; position: absolute; inset: 0; z-index: -1; }
+.lino-btn::before { background: var(--surface-bg); clip-path: var(--rough-clip-sm); }
+.lino-btn:nth-child(3n+2)::before { clip-path: var(--rough-clip-sm-2); }
+.lino-btn:nth-child(3n)::before { clip-path: var(--rough-clip-sm-3); }
+.lino-btn:hover, .lino-btn[aria-expanded=true] { --surface-bg: var(--_bg-h); }
+.lino-btn:is(:active, [data-pressed]) { --surface-bg: var(--_bg-p); transition-duration: var(--dur-fast); }
+/* the press (src/ds/tokens.css): tokens.css shrinks on :active, which bits cancels on a menu trigger; press.js marks it */
+:is(.lino-btn, .lino-toggle, .lino-swatch)[data-pressed]:not(:disabled) { transform: scale(var(--press-whole)); }
+:is(.lino-btn, .lino-toggle, .lino-swatch)[data-pressed]:not(:disabled) > * { transform: scale(var(--press-content)); }
+.lino-btn:disabled { opacity: .4; cursor: not-allowed; --surface-bg: var(--_bg); }
+.lino-btn svg { display: block; flex: none; }
+/* icons (src/ds/PRINCIPLES.md, Icons), sized by the glyph, not the frame (src/ds/icon.js gives each its ratios), so
+   every icon looks one size and centres by its ink: --icon-size its longer side. Beside a label, .8em and 12px from it (measured on the glyph), centred on the
+   caps' middle: the line box's middle is .30em over the baseline, the caps' .322em, so it goes .02em up. Alone, --icon-sm / -md / -lg for a 32 / 40 / 56px control. Stroked up to the stem of the label's weight, alone too: an icon
+   button stands for a label */
+:where(.lino-btn, .lino-toggle) .lino-icon { --icon-box: calc(var(--icon-size) * var(--icon-h));
+  width: calc(var(--icon-size) * var(--icon-w)); height: var(--icon-box); translate: 0 -.02em;
+  margin: calc(var(--icon-size) * var(--icon-mt)) calc(var(--icon-size) * var(--icon-mr)) calc(var(--icon-size) * var(--icon-mb)) calc(var(--icon-size) * var(--icon-ml)); }
+.lino-btn, .lino-toggle { --icon-size: .8em; --icon-stem: var(--stem-700); }
+.lino-btn.is-icon { --icon-size: var(--icon-md); }
+.lino-btn.is-icon .lino-icon { translate: none; } /* alone: centred on the tile, not on caps */
+.lino-btn.is-icon.is-sm { --icon-size: var(--icon-sm); }
+.lino-btn.is-icon.is-lg { --icon-size: var(--icon-lg); }
+/* a panel tile on the paper (the profile, the map's buttons): no type near it, so its glyph is muted and --stem-alone,
+   half way to ink on hover */
+.lino-btn.is-panel.is-icon { --_fg: var(--color-muted); --icon-stem: var(--stem-alone); }
+.lino-btn.is-panel.is-icon:hover { --_fg: color-mix(in srgb, var(--color-muted), var(--color-text) 45%); }
+.lino-btn.is-ghost { --_bg: transparent; --_fg: var(--color-text); --_bg-h: color-mix(in srgb, var(--color-text) 6%, transparent);
+  --_bg-p: color-mix(in srgb, var(--color-text) 10%, transparent); }
+/* panel and accent: the border cut behind, the fill cut inside it */
+.lino-btn:is(.is-panel, .is-accent)::before { background: var(--_bd); clip-path: var(--rough-clip); }
+.lino-btn:is(.is-panel, .is-accent)::after { background: var(--surface-bg); clip-path: var(--rough-clip-in); }
+.lino-btn:is(.is-panel, .is-accent):nth-child(3n+2)::before { clip-path: var(--rough-clip-2); }
+.lino-btn:is(.is-panel, .is-accent):nth-child(3n+2)::after { clip-path: var(--rough-clip-in-2); }
+.lino-btn:is(.is-panel, .is-accent):nth-child(3n)::before { clip-path: var(--rough-clip-3); }
+.lino-btn:is(.is-panel, .is-accent):nth-child(3n)::after { clip-path: var(--rough-clip-in-3); }
+.lino-btn.is-panel { --_bg: var(--color-surface); --_fg: var(--color-text); --_bd: var(--panel-border, var(--color-border));
+  --_bg-h: color-mix(in srgb, var(--color-surface), var(--color-text) 3%); --_bg-p: color-mix(in srgb, var(--color-surface), var(--color-text) 6%); }
+.lino-btn.is-accent { --_bg: var(--color-accent); --_fg: var(--color-surface); --_bd: color-mix(in srgb, var(--color-accent), var(--color-text) 18%);
+  --_bg-h: color-mix(in srgb, var(--color-accent), var(--color-text) 10%); --_bg-p: color-mix(in srgb, var(--color-accent), var(--color-text) 18%); }
+/* icon: a square of the control height; lg: the 56px tile; pressed: full ink, like a held key */
+.lino-btn.is-icon { width: var(--_h); padding: 0; font-size: 20px; }
+.lino-btn.is-sm { --_h: var(--control-height-sm); padding: 0 11px; font-size: var(--text-sm); }
+.lino-btn.is-icon.is-sm { padding: 0; font-size: 16px; }
+.lino-btn.is-lg { --_h: 56px; font-size: 28px; }
+.lino-btn[aria-pressed=true] { --_bg: var(--color-text); --_fg: var(--color-background);
+  --_bg-h: color-mix(in srgb, var(--color-text), var(--color-background) 14%); --_bg-p: color-mix(in srgb, var(--color-text), var(--color-background) 22%); }
+
+/* focus: the shared ring, on the control and never clipped (its fill is on a layer) */
+:is(.lino-btn, .lino-toggle, .lino-swatch, .lino-switch, .lino-slider-thumb):focus { outline: none; }
+:is(.lino-btn, .lino-toggle, .lino-swatch, .lino-slider-thumb):focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+
+
+/* ---------- tag: a tier's label on its plate (data-tier), hugging the label with even room: .6em from its frame to the
+   caps above and below, .76em at the sides, inside the 2.75px frame (the map's tier tags, measured on the caps) ---------- */
+.lino-tag { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; height: 2.166em; padding: .607em .758em .563em;
+  color: var(--tier-ink, var(--tier-0-ink)); font: 800 var(--tag-size, var(--text-sm))/1 var(--font-display); letter-spacing: -.01em; white-space: nowrap;
+  --surface-border: var(--tier-frame, var(--tier-0-frame)); --surface-bg: var(--tier-bg, var(--tier-0-bg)); }
+
+
+/* ---------- toggle group: one tile slides to the item that is on (toggle-group.svelte places it) ---------- */
+/* the items are controls of their own height (--control-height, -sm); the track is one 4px unit round them, measured
+   on the cut edges: its large cut sits ~1.3px inside its box, an item's small cut ~.65px, so the padding is 4 + .65 ≈
+   5px and the gap 4 - 2 x .65 ≈ 3px. bare: no track, on a toolbar, the tile the accent */
+.lino-toggles { position: relative; isolation: isolate; box-sizing: border-box; display: inline-flex; align-items: center; gap: 3px; vertical-align: middle;
+  --_item-h: var(--control-height); --_item-fs: var(--text-md); --_icon: var(--icon-md); }
+.lino-toggles[data-size=sm] { --_item-h: var(--control-height-sm); --_item-fs: var(--text-sm); --_icon: var(--icon-sm); }
+.lino-toggles[data-orientation=vertical] { flex-direction: column; align-items: stretch; }
+/* the track's tint on the outline layer, under the tile (the inner layer would paint over it) */
+.lino-toggles[data-variant=track] { padding: 5px; --surface-border: color-mix(in srgb, var(--color-text) 7%, transparent); --surface-bg: transparent; }
+.lino-toggles[data-variant=bare] { gap: var(--space-2); }
+.lino-thumb { position: absolute; left: 0; top: 0; z-index: -1; pointer-events: none; --_fill: var(--color-thumb, var(--color-surface)); --_edge: var(--_fill);
+  transition: transform var(--dur) var(--ease-out), width var(--dur) var(--ease-out), height var(--dur) var(--ease-out); }
+.lino-thumb[hidden] { display: none; }
+.lino-thumb::before, .lino-thumb::after { content: ''; position: absolute; inset: 0; }
+.lino-thumb::before { background: var(--_edge); clip-path: var(--rough-clip-sm); }
+.lino-thumb::after { background: var(--_fill); clip-path: var(--rough-clip-sm-in); }
+[data-variant=bare] > .lino-thumb { --_fill: var(--color-accent); --_edge: color-mix(in srgb, var(--color-accent), var(--color-text) 18%); }
+
+/* an item: muted until hovered or on, every colour a token (a translucent ink would darken where an icon's stroke
+   meets its fill) */
+.lino-toggle { position: relative; isolation: isolate; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; flex: 1 0 auto;
+  height: var(--_item-h); margin: 0; padding: 0 var(--space-4); border: 0; border-radius: 0; background: none; box-shadow: none; appearance: none;
+  color: var(--color-muted); font: 700 var(--_item-fs)/.9 var(--font-display); letter-spacing: var(--tracking-tighter);
+  white-space: nowrap; cursor: pointer; user-select: none; -webkit-user-select: none; --surface-bg: transparent;
+  transition: --surface-bg var(--dur) var(--ease-out), color var(--dur) var(--ease-out); }
+.lino-toggle::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--surface-bg); clip-path: var(--rough-clip-sm); }
+.lino-toggle:nth-of-type(3n+2)::before { clip-path: var(--rough-clip-sm-2); }
+.lino-toggle:nth-of-type(3n)::before { clip-path: var(--rough-clip-sm-3); }
+.lino-toggle > .lino-face { display: inline-flex; align-items: center; gap: var(--space-3); transition: transform var(--dur) var(--ease-out); }
+.lino-toggle:hover, .lino-toggle[data-state=on] { color: var(--color-text); }
+.lino-toggle:hover:not([data-state=on]) { --surface-bg: color-mix(in srgb, var(--color-surface) 55%, transparent); }
+.lino-toggle:disabled { cursor: not-allowed; opacity: .4; --surface-bg: transparent; }
+/* icon only: a square, the glyph --icon-md (-sm) and weighing like the label it stands for */
+.lino-toggle.is-icon { flex: none; width: var(--_item-h); padding: 0; --icon-size: var(--_icon); }
+.lino-toggle.is-icon .lino-icon { pointer-events: none; }
+/* the tools bar has no type: its glyphs are --stem-alone, their 36px frames at 80% of the tile as Figma draws them */
+[data-variant=bare] > .lino-toggle.is-icon { --icon-stem: var(--stem-alone); }
+[data-variant=bare] > .lino-toggle.is-icon .lino-icon { --icon-box: calc(var(--_item-h) * .8 * 42 / 36); translate: none;
+  width: var(--icon-box); height: var(--icon-box); margin: calc(var(--_item-h) * -.8 / 12); }
+[data-variant=bare] > .lino-toggle:hover:not([data-state=on]) { --surface-bg: color-mix(in srgb, var(--color-text) 4%, transparent); }
+[data-variant=bare] > .lino-toggle[data-state=on] { color: var(--color-surface); }
+
+/* ---------- input and its label: the field's box carries the plate (a chip cut), the input inside is bare; focus deepens
+   the fill, no ring for a cut to clip ---------- */
+.lino-input { box-sizing: border-box; display: inline-flex; align-items: center; width: 100%; min-width: 0; height: var(--control-height); vertical-align: middle;
+  cursor: text; --surface-bg: var(--color-action-background); }
+.lino-input > input { flex: 1; min-width: 0; height: 100%; margin: 0; padding: 0 var(--space-3); border: 0; border-radius: 0; background: none; box-shadow: none; outline: none;
+  color: var(--color-action-text); font: 500 var(--text-sm)/1 var(--font-text); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums; }
+.lino-input > input::placeholder { color: var(--color-muted); opacity: 1; }
+.lino-input:hover { --surface-bg: color-mix(in srgb, var(--color-action-background), var(--color-text) 5%); }
+.lino-input:focus-within { --surface-bg: color-mix(in srgb, var(--color-action-background), var(--color-text) 8%); }
+.lino-input:has(> [aria-invalid=true]) { --surface-bg: color-mix(in srgb, var(--color-action-background), var(--color-wine) 12%); }
+.lino-input:has(> :disabled) { opacity: .45; cursor: default; --surface-bg: var(--color-action-background); }
+.lino-field-label { display: inline-flex; align-items: center; gap: var(--space-3); color: var(--color-text); font: 500 var(--text-sm)/1 var(--font-display); letter-spacing: var(--tracking-tight); user-select: none; -webkit-user-select: none; }
+.lino-switch:disabled + .lino-field-label, .lino-field-label:has(+ :disabled) { opacity: .45; }
+
+/* ---------- menus ---------- */
+:is([data-slot=dropdown-menu-content], [data-slot=dropdown-menu-sub-content], [data-slot=menubar-content], [data-slot=menubar-sub-content]) {
+  position: relative; isolation: isolate; z-index: 1000; box-sizing: border-box; display: flex; flex-direction: column; min-width: 200px; width: auto;
+  max-height: calc(100vh - 16px); overflow: auto; overscroll-behavior: contain; padding: calc(var(--space-2) + 2px);
+  border: 0; border-radius: 0; background: none; box-shadow: none; outline: none; color: var(--color-text);
+  font: 500 var(--text-md)/.9 var(--font-display); --surface-bg: var(--color-surface); --surface-border: var(--color-border); --press-whole: 1; --press-content: var(--press); }
+/* a grid menu: --menu-columns columns of tiles */
+.lino-grid[data-slot] { display: grid; grid-template-columns: repeat(var(--menu-columns, 4), minmax(0, 1fr)); gap: var(--space-1); }
+
+/* a row: a hand-cut tile behind the content, one highlight for hover and keyboard, the checked one (a radio or checkbox
+   item: no mark) the accent in its deeper border, an indeterminate one a tint of it */
+:is([data-slot=dropdown-menu-item], [data-slot=dropdown-menu-radio-item], [data-slot=dropdown-menu-checkbox-item], [data-slot=dropdown-menu-sub-trigger], [data-slot=menubar-item], [data-slot=menubar-radio-item], [data-slot=menubar-checkbox-item], [data-slot=menubar-sub-trigger]) {
+  position: relative; isolation: isolate; box-sizing: border-box; display: flex; align-items: center; gap: var(--space-3); min-height: 36px; padding: 6px var(--space-3);
+  border-radius: 0; background: none; color: var(--color-text); font-size: var(--text-md); line-height: .9; letter-spacing: var(--tracking-tight);
+  white-space: nowrap; cursor: default; outline: none; user-select: none; -webkit-user-select: none; --surface-bg: transparent;
+  transition: --surface-bg var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  &::before, &::after { content: ''; position: absolute; inset: 0; z-index: -1; }
+  &::before { background: var(--_edge, var(--surface-bg)); clip-path: var(--rough-clip-sm); }
+  &::after { background: var(--surface-bg); clip-path: var(--rough-clip-sm-in); }
+  &:nth-of-type(3n+2)::before { clip-path: var(--rough-clip-sm-2); } &:nth-of-type(3n+2)::after { clip-path: var(--rough-clip-sm-in-2); }
+  &:nth-of-type(3n)::before { clip-path: var(--rough-clip-sm-3); } &:nth-of-type(3n)::after { clip-path: var(--rough-clip-sm-in-3); }
+  &[data-highlighted], &[data-state=open] { background: none; color: var(--color-text); --surface-bg: color-mix(in srgb, var(--color-text) 6%, var(--color-surface)); }
+  &:active:not([data-disabled]) { --surface-bg: color-mix(in srgb, var(--color-text) 10%, var(--color-surface)); }
+  &[data-disabled] { opacity: 1; color: var(--color-muted); }
+  &[data-state=checked], &.is-checked { --surface-bg: var(--color-accent); --_edge: color-mix(in srgb, var(--color-accent), var(--color-text) 18%); color: var(--color-surface); }
+  &[data-state=indeterminate] { --surface-bg: color-mix(in srgb, var(--color-accent) 30%, var(--color-surface)); }
+  &[data-state=checked][data-highlighted], &.is-checked[data-highlighted] { background: none; color: var(--color-surface); --surface-bg: color-mix(in srgb, var(--color-accent), var(--color-text) 10%); }
+  & > .lino-label { flex: 1; padding-block: 2px; }
+  & > .lino-more { flex: none; width: 14px; height: 14px; margin-left: var(--space-2); opacity: .6; rotate: -90deg; }
+  & > svg:not(.lino-icon, .lino-more) { flex: none; width: 24px; height: 24px; }
+}
+/* a vertical tile for grid menus: the icon above the label, both centred */
+.lino-tile[data-slot] { flex-direction: column; justify-content: center; gap: var(--space-1); min-width: 64px; min-height: 0; padding: var(--space-2); text-align: center; }
+:is([data-slot=dropdown-menu-separator], [data-slot=menubar-separator]) { flex: none; height: 3px; margin: 3px var(--space-3); background: var(--color-divider); clip-path: var(--rough-rule); }
+
+
+}

@@ -1,0 +1,40 @@
+{
+  "name": "calendar-astro",
+  "version": "1.0.0",
+  "description": "Community event calendar and administration - Astro, Vue and SQLite",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/generate-tokens.mjs && node scripts/generate-admin-lino.mjs",
+    "dev": "node scripts/astro.mjs dev",
+    "prebuild": "node scripts/generate-tokens.mjs && node scripts/generate-admin-lino.mjs",
+    "build": "node scripts/astro.mjs build",
+    "start": "node dist/server/entry.mjs",
+    "demo": "node scripts/local-demo.mjs",
+    "test": "node scripts/verify.mjs",
+    "backup": "node scripts/backup-db.mjs",
+    "test:ui": "node scripts/verify-ui.mjs",
+    "test:admin": "node scripts/verify-admin.mjs",
+    "typecheck": "vue-tsc --noEmit",
+    "preview:community": "node scripts/community-preview.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@astrojs/node": "^11.1.11",
+    "@astrojs/vue": "^7.1.2",
+    "astro": "^7.4.7",
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.4",
+    "lino-ui": "0.2.0",
+    "vue": "^3.5.45"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.6",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.14"
+  }
+}

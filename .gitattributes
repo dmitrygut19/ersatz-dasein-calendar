@@ -1,0 +1,2 @@
+# Preserve the supplied Figma SVG exports byte-for-byte on every platform.
+/public/assets/lodge-covers/*.svg -text
