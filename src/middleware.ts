@@ -10,7 +10,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const guarded = url.pathname.startsWith('/admin') || url.pathname.startsWith('/api');
   if (!guarded) return next();
   if (!remoteAllowed() && !['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)) {
-    return json({ message: 'Админка доступна только локально.' }, 403);
+    return json({ message: 'Админка доступна только с localhost. Для сервера задайте CALENDAR_ALLOW_REMOTE=1 (см. README, раздел «Развёртывание»).' }, 403);
   }
   if (!['GET', 'HEAD'].includes(request.method)) {
     // Behind proxies (e.g. Render) the request URL arrives as http://localhost:<port>;
@@ -31,7 +31,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return json({ message: 'Локальный тестовый доступ выключен.' }, 401);
   }
   if (!sessionRoute && !publicApi && !adminOpen() && !isAdmin(request)) {
-    return json({ message: 'Нет доступа. Откройте адрес, выданный локальным запуском.' }, 401);
+    return json({ message: 'Нет доступа. Войдите по секретной ссылке из журнала запуска или откройте админку настройкой CALENDAR_ADMIN_OPEN=1 (см. README, раздел «Развёртывание»).' }, 401);
   }
   async function respond() {
     const response = await next();
