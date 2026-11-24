@@ -1,8 +1,6 @@
 ---
 import AdminWorkspace from '../../components/admin/AdminWorkspace.vue';
 import { listTypes } from '../../lib/types';
-import { publicDemoEnabled } from '../../lib/public-demo';
-import { sharedCalendarEnabled } from '../../lib/shared-calendar';
 import '../../styles/tokens.css';
 import '../../styles/app.css';
 import '../../styles/admin.css';
@@ -10,8 +8,7 @@ import '../../styles/admin-events.css';
 import '../../styles/admin-lino-kit.css';
 import '../../styles/admin-lino.css';
 const types = listTypes();
-const temporaryDemo = publicDemoEnabled() && !sharedCalendarEnabled();
 const screen = Astro.url.searchParams.get('screen') ?? 'calendar';
 const initialUi = (Astro.url.searchParams.get('adminUi') ?? process.env.CALENDAR_ADMIN_UI ?? 'lino') === 'classic' ? 'classic' : 'lino';
 ---
-<!doctype html><html lang="ru" data-admin-release="2026-11-21-current-calendar-preview" data-public-demo={temporaryDemo ? '1' : undefined}><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Админка календаря</title></head><body><AdminWorkspace initialTypes={types} initialScreen={screen} publicDemo={temporaryDemo} initialUi={initialUi} client:load/></body></html>
+<!doctype html><html lang="ru" data-admin-release="2026-11-25-without-demo"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Админка календаря</title></head><body><AdminWorkspace initialTypes={types} initialScreen={screen} initialUi={initialUi} client:load/></body></html>

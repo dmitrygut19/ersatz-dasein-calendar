@@ -19,11 +19,11 @@
 - GET /api/calendar/events/:id.ics — экспорт с проверкой прав.
 - POST /api/calendar/activity — view/open/reminder_on/reminder_off.
 
-Публичность определяется middleware по маршруту и методу. /api/calendar/sync — служебный маршрут общего демо-источника, не публичный административный API.
+Публичность определяется middleware по маршруту и методу.
 
 ## Административные API
 
-Требуют доступа администратора вне режима демонстрации.
+Требуют доступа администратора (вход по секретной ссылке), если админка не открыта настройкой CALENDAR_ADMIN_OPEN=1.
 
 - /api/types, /api/types/:id — CRUD типов.
 - /api/events, /api/events/:id — CRUD событий; ID выпуска seriesId@YYYY-MM-DD кодируется в URL.

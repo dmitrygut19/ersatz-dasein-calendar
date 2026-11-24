@@ -3,21 +3,12 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import * as schema from './schema';
-import { publicDemoEnabled } from '../public-demo';
-import { AsyncLocalStorage } from 'node:async_hooks';
-import { sharedCalendarEnabled } from '../shared-calendar';
 
 // Never opens the Next.js database. Call lazily after the access guard.
 let database: ReturnType<typeof open> | undefined;
-let sharedDatabase: ReturnType<typeof open> | undefined;
-const requestDatabase = new AsyncLocalStorage<ReturnType<typeof open>>();
 const importGenerations = new WeakMap<object, number>();
 function open() {
-  const file = sharedCalendarEnabled()
-    ? path.resolve(process.env.CALENDAR_SHARED_DATABASE_PATH ?? 'data/shared-community/calendar.sqlite')
-    : publicDemoEnabled()
-    ? path.resolve(process.env.CALENDAR_PUBLIC_DEMO_DIRECTORY ?? 'data/public-demo', 'calendar.sqlite')
-    : path.resolve(process.env.CALENDAR_DATABASE_PATH ?? 'data/experiment.sqlite');
+  const file = path.resolve(process.env.CALENDAR_DATABASE_PATH ?? 'data/experiment.sqlite');
   const original = path.resolve('../calendar-app/data/calendar.sqlite');
   if (file === original || file.includes(`${path.sep}calendar-app${path.sep}`)) {
     throw new Error('The experiment cannot use the calendar-app database.');
@@ -38,42 +29,10 @@ function open() {
     }
   }
   const db = drizzle(sqlite, { schema });
-  if (publicDemoEnabled() && !sharedCalendarEnabled()) resetDemoImports(db);
   return db;
 }
 function baseDb() { return database ??= open(); }
-export function getDb() { return sharedCalendarEnabled() ? sharedDatabase ??= open() : requestDatabase.getStore() ?? baseDb(); }
-
-export function createDemoDatabase() {
-  if (!publicDemoEnabled()) throw new Error('Private review databases are demo-only.');
-  const snapshot = baseDb().$client.serialize();
-  // SQLite deserialize cannot use WAL headers; the snapshot already includes its pages.
-  // See sqlite.org/c3ref/deserialize.html (file-format bytes 18 and 19).
-  snapshot[18] = 1;
-  snapshot[19] = 1;
-  const sqlite = new Database(snapshot);
-  sqlite.pragma('foreign_keys = ON');
-  return drizzle(sqlite, { schema });
-}
-
-export function withDemoDatabase<T>(db: ReturnType<typeof open>, action: () => T): T {
-  return requestDatabase.run(db, action);
-}
+export function getDb() { return baseDb(); }
 
 export function importGeneration(db = getDb()) { return importGenerations.get(db) ?? 0; }
 
-export function resetDemoImports(db = getDb()) {
-  if (!publicDemoEnabled()) throw new Error('Demo reset is not available in the application.');
-  if (sharedCalendarEnabled()) return;
-  db.$client.transaction(() => {
-    // Clear only imported copies and their connection; manual demo work is retained.
-    for (const table of ['participant_activity', 'participant_reminders']) {
-      db.$client.exec(`DELETE FROM ${table} WHERE EXISTS (SELECT 1 FROM events e WHERE e.source != 'manual' AND (event_key = e.id OR event_key LIKE e.id || '@%'))`);
-    }
-    db.$client.exec("DELETE FROM event_type_usage WHERE event_id IN (SELECT id FROM events WHERE source != 'manual')");
-    db.$client.exec("DELETE FROM events WHERE source != 'manual'");
-    db.$client.exec('DELETE FROM external_sources; DELETE FROM import_matches; DELETE FROM type_suggestions; DELETE FROM type_skips;');
-    db.$client.exec("DELETE FROM calendar_settings WHERE key IN ('oauth_state', 'oauth_state_expires'); INSERT INTO calendar_settings (key,value) VALUES ('manual_mode','1') ON CONFLICT(key) DO UPDATE SET value='1'");
-  })();
-  importGenerations.set(db, importGeneration(db) + 1);
-}

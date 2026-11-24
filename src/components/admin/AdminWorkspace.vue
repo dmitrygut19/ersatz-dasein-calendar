@@ -19,7 +19,6 @@ import AppearanceEditor from './AppearanceEditor.vue';
 import ParticipantsPanel from './ParticipantsPanel.vue';
 import { linoSurface as vLinoSurface } from '../../lib/lino-card-frame';
 import type { Appearance } from '../../lib/appearance';
-import { prepareDemoPage } from '../../lib/demo-page';
 import { dateLabel, dateShortLabel, initialEvents, screens, type DemoEvent } from '../../lib/admin-demo';
 import { prepareCalendarSounds, startCalendarSoundInput, stopCalendarSoundInput, playCalendarSound } from '../../lib/calendar-sound';
 
@@ -57,7 +56,7 @@ const lodges = ref<{id:string;name:string;iconUrl:string|null}[]>([]);
 const creationDate=ref(''), eventSaving=ref(false), eventError=ref('');
 function createOnDate(date:string) { creationDate.value=date; eventError.value=''; go('event-new'); nextTick(()=>document.getElementById('event-name')?.focus()); }
 function accessSummary(event: DemoEvent) { return 'Доступ участников: '+adminAccessTags(event,lodges.value).filter(tag=>tag.key!=='degree').map(tag=>tag.label).join(' · '); }
-const props = defineProps<{ initialTypes: any[]; initialScreen: string; publicDemo?: boolean; initialUi?: string }>();
+const props = defineProps<{ initialTypes: any[]; initialScreen: string; initialUi?: string }>();
 const modernUi=props.initialUi !== 'classic';
 provide(ADMIN_LINO,modernUi);
 const currentTypes = ref(props.initialTypes);
@@ -170,7 +169,6 @@ function toDemo(event: ServerOccurrence): DemoEvent {
   };
 }
 async function api(url: string, options: RequestInit = {}) {
-  await prepareDemoPage();
   const response = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers }, signal: AbortSignal.timeout(25_000) });
   const result = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(result.message ?? 'Не удалось выполнить действие.');
@@ -214,7 +212,6 @@ function applyStatus(next: IntegrationStatus) {
 async function loadIntegration() {
   const { integration: next } = await api('/api/integration') as { integration: IntegrationStatus };
   applyStatus(next);
-  if (props.publicDemo && ['none','manual'].includes(next.state) && scene.value.startsWith('integration-')) scene.value = 'integration-disconnected';
 }
 function notify(value: string) { notification.value = value; clearTimeout(timer); timer = setTimeout(() => { notification.value = ''; },5000); }
 async function go(value: string) {

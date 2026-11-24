@@ -10,12 +10,9 @@ import { listOccurrences, upcomingWindow, type OccurrenceDto } from './events';
 import { recordActivity } from './analytics';
 import { isGroupMember } from './groups';
 import type { Appearance } from './appearance';
-import { publicDemoEnabled } from './public-demo';
 import { googleCalendarUrl } from './calendar-share';
 import { safeWebUrl } from './community-config';
-import { cardReviewEnabled } from './card-review';
 import { degreeAllowed } from './degree-access';
-import { sharedCalendarEnabled } from './shared-calendar';
 
 const RANK: Record<string, number> = { I: 1, II: 2, III: 3 };
 const rank = (value: string | null | undefined) => (value ? RANK[value] ?? 0 : 0);
@@ -106,11 +103,11 @@ function accessFor(item: OccurrenceDto, viewer: Viewer) {
     requirements, accessState: (requirements.length ? viewer ? 'blocked' : 'guest' : 'allowed') as PublicEvent['accessState'] };
 }
 
-export function publicCalendar(from?: string, to?: string, participantKey?: string | null, demoMember = false, previewDegree?: string): PublicEvent[] {
+export function publicCalendar(from?: string, to?: string, participantKey?: string | null, previewDegree?: string): PublicEvent[] {
   const window = upcomingWindow();
   const viewer = resolveViewer(participantKey);
   return listOccurrences(from ?? window.from, to ?? window.to)
-    .filter(item => item.status === 'scheduled' || cardReviewEnabled())
+    .filter(item => item.status === 'scheduled')
     .map(item => {
       const standardAccess = accessFor(item, viewer);
       // Admin preview compares degrees only; it does not impersonate a participant
@@ -119,22 +116,12 @@ export function publicCalendar(from?: string, to?: string, participantKey?: stri
         ? !previewDegree || degreeAllowed(rank(previewDegree), item.allowedDegrees, item.typeDegree)
           ? { canFollow: true, reason: null }
           : { canFollow: false, reason: `Нужен градус ${item.allowedDegrees?.join(' или ') || item.typeDegree}` }
-        : cardReviewEnabled() && demoMember
-        ? {canFollow:true,reason:null}
-        : sharedCalendarEnabled()
-        ? demoMember ? { canFollow: true, reason: null } : standardAccess
-        : publicDemoEnabled()
-        ? demoMember
-          ? { canFollow: true, reason: null }
-          : item.typeName === 'Конгресс'
-            ? standardAccess
-            : { canFollow: false, reason: 'В демо без входа открыт только Конгресс' }
         : standardAccess;
       const access = { ...standardAccess, ...permission };
       if (item.status === 'cancelled') access.canFollow = false;
-      // Preview/demo retain their explicit semantics, but never return hidden URLs.
+      // Preview retains its explicit semantics, but never returns hidden URLs.
       if (access.canFollow) { access.requirements = []; access.accessState = 'allowed'; }
-      else if (previewDegree !== undefined || publicDemoEnabled()) access.accessState = demoMember ? 'blocked' : 'guest';
+      else if (previewDegree !== undefined) access.accessState = 'guest';
       const sourceUrl = safeWebUrl(item.sourceUrl);
       return {
         id: item.id, topicLodgeId: item.topicLodgeId, affiliationDegree: item.affiliationDegree, affiliationDegrees: item.affiliationDegrees, communityEvent: item.communityEvent, title: item.title, date: item.date, start: item.start, end: item.end,

@@ -1,3 +1,5 @@
+// Test fixtures for the automated browser checks only. The application never runs this seed;
+// hosted and local launches use config/community-calendar.json (scripts/seed-shared-calendar.mjs).
 import Database from 'better-sqlite3';
 import { mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, useId } from 'vue';
-import { prepareDemoPage } from '../../lib/demo-page';
 import MentorButton from '../ui/MentorButton.vue';
 import EventDetailCard from './EventDetailCard.vue';
 import MobileEventDialog from './MobileEventDialog.vue';
@@ -49,7 +48,6 @@ function requestEventClose(){
   if(mobile.value && eventPanel.value && 'requestClose' in eventPanel.value)eventPanel.value.requestClose();
   else closeEvent(true);
 }
-const demoPresentation = ref(false);
 function chooseDate(date:string){selectedDate.value=date;const index=cells.value.findIndex(cell=>cell.date===date);if(index>=0&&cells.value[index].events.length)openDay(index);else closeEvent();}
 function onCardKey(event:KeyboardEvent){if(!mobile.value&&event.key==='Escape'&&selected.value)closeEvent();}
 const calendarRoot = ref<HTMLElement | null>(null);
@@ -79,39 +77,18 @@ const loading = ref(true);
 const lodgeOptions = computed(() => lodgeDirectory.value.map(row => ({value:row.id,label:row.name,iconUrl:row.id==='raubritters'?null:lodgeIconUrl(row.id,row.iconUrl),iconName:row.id==='raubritters'?undefined:exampleLodgeIcon(row.id)})));
 const lodgeSummary = computed(() => !filterLodges.value.length ? 'Все' : filterLodges.value.length > 1 ? `Ложи: ${filterLodges.value.length}` : lodgeDirectory.value.find(row=>row.id===filterLodges.value[0])?.name ?? 'Ложи: 1');
 const account = ref<PublicAccount | null>(null);
-const quickPreview = ref(false);
 type CardState = 'idle' | 'loading' | 'error' | 'checking' | 'access-error' | 'deleted';
 const cardState = ref<CardState>('idle'), coverFailed = ref(false);
 const reviewQuery = () => '';
 const gated = computed(() => !props.embedded && Boolean(selected.value && (!selected.value.canFollow || cardState.value !== 'idle')));
 const needsDegree = computed(() => selected.value?.requirements?.some(row => row.kind === 'degree' || row.kind === 'tier'));
 const memberships = computed(() => selected.value?.requirements?.filter(row => row.kind === 'membership') ?? []);
-const calendarHref = computed(() => selected.value?.calendarUrl?.startsWith('/api/') ? selected.value.calendarUrl + '?participant=' + encodeURIComponent(identity.telegramId) + reviewQuery() + (demoLoggedIn.value ? '&demoMember=1' : '') : selected.value?.calendarUrl);
+const calendarHref = computed(() => selected.value?.calendarUrl?.startsWith('/api/') ? selected.value.calendarUrl + '?participant=' + encodeURIComponent(identity.telegramId) + reviewQuery() : selected.value?.calendarUrl);
 watch(() => selected.value?.id, () => { coverFailed.value = false; coverBottomSpace.value = 0; });
-async function authorizeCard() {
-  if (demoLoginAllowed.value) await enterDemoProfile();
-  else notify('Telegram-авторизация пока не подключена.');
-}
-const demoLoginAllowed = ref(false), demoLoggedIn = ref(false);
-async function enterDemoProfile() {
-  if (demoLoginAllowed.value) {
-
-    demoLoggedIn.value = true;
-    await loadEvents();
-    notify('Демо-вход: открыты переходы ко всем событиям. Telegram-авторизация пока не подключена.');
-    return;
-  }
+function authorizeCard() {
   notify('Telegram-авторизация пока не подключена.');
 }
-async function leaveDemoProfile() {
-  const reload = demoLoggedIn.value;
-  account.value = null;
-  quickPreview.value = false; demoLoggedIn.value = false;
-  if (reload) await loadEvents();
-}
-const displayAccount = computed<PublicAccount | null>(() => quickPreview.value ? {
-  nick: account.value?.nick || '@nickname', degree: 'II',
-} : account.value);
+const displayAccount = computed<PublicAccount | null>(() => account.value);
 const accountInitials = computed(() => (displayAccount.value?.nick.replace(/^@/, '').slice(0, 2) ?? '').toUpperCase());
 const degreeTier = computed(() => designTokens.interfaceLibrary.degreeTierMap[displayAccount.value?.degree ?? 'I']);
 function coverMode(event?: PublicEvent | null, _date?: string) {
@@ -384,13 +361,11 @@ async function loadEvents() {
   loadError.value = '';
   if (selected.value && !props.embedded) cardState.value = 'checking';
   try {
-    await prepareDemoPage();
     const { from, to } = gridRange.value;
     const participant = identity.telegramId;
-    const demoQuery = demoLoggedIn.value ? '&demoMember=1' : '';
     const response = await fetch(props.embedded
       ? `/api/calendar-preview?from=${from}&to=${to}&degree=${previewDegree.value === 'Все' ? '' : previewDegree.value}`
-      : `/api/calendar?participant=${encodeURIComponent(participant)}&from=${from}&to=${to}${demoQuery}${reviewQuery()}`, {signal: AbortSignal.timeout(25_000)});
+      : `/api/calendar?participant=${encodeURIComponent(participant)}&from=${from}&to=${to}${reviewQuery()}`, {signal: AbortSignal.timeout(25_000)});
     if (!response.ok) throw new Error();
     const result = await response.json();
     if (sequence !== loadSequence) return;
@@ -406,8 +381,6 @@ async function loadEvents() {
     events.value = result.events;
     lodgeDirectory.value = result.lodges ?? [];
     cardState.value = 'idle';
-    demoLoginAllowed.value = result.demoLoginAllowed === true;
-    demoPresentation.value = result.cardReview === true || result.demoLoginAllowed === true;
     account.value = result.account ?? null;
     if (selected.value) {
       const fresh = events.value.find(event => event.id === selected.value?.id);
@@ -484,8 +457,8 @@ onBeforeUnmount(() => {
             </div>
           </div>
           <SegmentedControl v-if="embedded" v-model="previewDegree" class="uc-degree-preview" :options="['Все','I','II','III']" label="Градус" framed/>
-          <div v-else-if="displayAccount" v-lino-surface="true" class="uc-account"><span class="uc-avatar">{{ accountInitials }}</span><span>{{ displayAccount.nick }}</span><span v-lino-surface="{kind:'tag'}" class="uc-degree" :data-tier="degreeTier">Градус {{ displayAccount.degree }}</span><button v-if="quickPreview || demoLoggedIn" type="button" class="text-action" v-bind="soundAttrs()" @click="leaveDemoProfile">Выйти из просмотра</button></div>
-          <MentorButton v-else :variant="1" class="uc-tg" v-bind="soundAttrs('button')" @click="enterDemoProfile">{{ demoLoginAllowed ? 'Демо-вход' : 'Войти через Telegram' }}</MentorButton>
+          <div v-else-if="displayAccount" v-lino-surface="true" class="uc-account"><span class="uc-avatar">{{ accountInitials }}</span><span>{{ displayAccount.nick }}</span><span v-lino-surface="{kind:'tag'}" class="uc-degree" :data-tier="degreeTier">Градус {{ displayAccount.degree }}</span></div>
+          <MentorButton v-else :variant="1" class="uc-tg" v-bind="soundAttrs('button')" @click="authorizeCard">Войти через Telegram</MentorButton>
         </div>
         <div v-if="!embedded" class="uc-filters" role="group" aria-label="Фильтры событий">
           <LinoMultiSelect v-model="filterLodges" class="uc-lodges" :options="lodgeOptions" label="Ложи" :summary="lodgeSummary"/>

@@ -7,7 +7,6 @@ import { once } from 'node:events';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Database from 'better-sqlite3';
-import { seedDemo } from './seed.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 assert.ok(existsSync(path.join(root, 'dist/server/entry.mjs')), 'Run npm run build first.');
@@ -112,7 +111,7 @@ try {
     await list(); await list();
     withDb(db => assert.equal(db.prepare('SELECT COUNT(*) AS count FROM schema_migrations').get().count, 9));
   });
-  await check('Working mode does not expose the demo reset endpoint', async () => {
+  await check('The removed demo reset endpoint is not available', async () => {
     assert.equal((await request('/api/demo/reset',{method:'POST',body:{}})).status,404);
   });
   await check('Create saves all fields and trims strings', async () => {
@@ -447,7 +446,8 @@ try {
     const payload = await response.json();
     const events = payload.events;
     assert.equal('previewAllowed' in payload, false);
-    assert.equal(payload.demoLoginAllowed, false);
+    assert.equal('demoLoginAllowed' in payload, false);
+    assert.equal('cardReview' in payload, false);
     assert.equal('previewAllowed' in (await (await request('/api/calendar')).json()), false);
     assert.ok(events.length > 0);
     const congress = events.find(event => event.title === 'Конгресс (онлайн)');
@@ -635,59 +635,6 @@ try {
     const member = await (await request('/api/calendar?participant=' + analystId, { auth: true })).json();
     assert.equal(member.account.nick, '@analyst'); assert.equal(member.account.degree, 'II');
     assert.equal((await (await request('/api/calendar?participant=unknown', { auth: false })).json()).account, null);
-  });
-  await check('Demo seed keeps four types and multi-event days without overwriting user edits on restart', async () => {
-    const file = path.join(runDirectory, 'seed.sqlite');
-    seedDemo(file); seedDemo(file);
-    const db = new Database(file);
-    try {
-      const item = db.prepare("SELECT e.url,e.start_date,t.access_label,t.degree,t.venue_url FROM events e JOIN event_types t ON t.id=e.type_id WHERE e.id='demo-congress-series'").get();
-      assert.equal(item.url, ''); assert.equal(item.venue_url, 'https://mentors.ersatz-dasein.ru/'); assert.equal(item.access_label, 'Все'); assert.equal(item.degree, null);
-      assert.match(item.start_date, /^\d{4}-\d{2}-\d{2}$/);
-      assert.equal(db.prepare('SELECT COUNT(*) AS count FROM events').get().count, 7);
-      for (const venue of ['Jitsi', 'YouTube']) assert.equal(db.prepare('SELECT COUNT(*) AS count FROM events WHERE venue = ?').get(venue).count, 2);
-      const weekdays = db.prepare('SELECT repeat_rule FROM events WHERE repeat_rule IS NOT NULL').all().map(event => JSON.parse(event.repeat_rule).byWeekday[0]);
-      assert.equal(weekdays.filter(day => day === 0).length, 1);
-      assert.equal(weekdays.filter(day => day === 6).length, 2);
-      for (const day of [1, 2, 3, 4, 5]) assert.equal(weekdays.filter(weekday => weekday === day).length, 0);
-      assert.ok(db.prepare('SELECT repeat_rule FROM events WHERE repeat_rule IS NOT NULL').all().every(event => JSON.parse(event.repeat_rule).count === 3));
-      const special = db.prepare("SELECT start_date, repeat_rule, type_id FROM events WHERE id='demo-saturnalia-special'").get();
-      assert.deepEqual([special.start_date, special.repeat_rule, special.type_id], ['2026-11-14', null, 'demo-saturnalia']);
-      assert.equal(db.prepare('SELECT COUNT(*) AS count FROM event_types').get().count, 4);
-      assert.equal(db.prepare("SELECT COUNT(*) AS count FROM events WHERE title IN ('Менторство','Разбор работ','Дазайн-арена','Открытое событие — демо')").get().count, 0);
-      const types = db.prepare("SELECT venue_url FROM event_types WHERE id IN ('demo-congress','demo-saturnalia')").all();
-      assert.equal(types.length, 2); assert.ok(types.every(type => type.venue_url === 'https://mentors.ersatz-dasein.ru/'));
-      db.prepare("UPDATE events SET url='https://example.org/my-link' WHERE id='demo-congress-series'").run();
-      db.prepare("UPDATE event_types SET venue_url='https://example.org/custom-type' WHERE id='demo-congress'").run();
-      seedDemo(file);
-      assert.equal(db.prepare("SELECT url FROM events WHERE id='demo-congress-series'").get().url, 'https://example.org/my-link');
-      assert.equal(db.prepare("SELECT venue_url FROM event_types WHERE id='demo-congress'").get().venue_url, 'https://example.org/custom-type');
-    } finally { db.close(); }
-  });
-  await check('New artwork uses explicit event types, keeps Saturnalia and release cover/appearance overrides on reseed', async () => {
-    const file=path.join(runDirectory,'artwork.sqlite'); seedDemo(file);
-    const db=new Database(file);
-    try {
-      const types=Object.fromEntries(db.prepare('SELECT id,cover_path FROM event_types').all().map(row=>[row.id,row.cover_path]));
-      assert.equal(types['demo-congress'],'/assets/panel/a5ff5.png');
-      assert.equal(types['demo-community-meeting'],'/assets/event-covers/community-table.png');
-      assert.equal(types['demo-project-discussion'],'/assets/event-covers/project-scrolls.png');
-      assert.equal(types['demo-saturnalia'],'/assets/panel/2a38c.png');
-      for(const [id,type] of [['demo-title-medium','demo-community-meeting'],['demo-title-long','demo-project-discussion']]) {
-        assert.equal(db.prepare('SELECT type_id FROM events WHERE id=?').get(id).type_id,type);
-        assert.equal(db.prepare('SELECT event_type_id FROM event_type_usage WHERE event_id=?').get(id).event_type_id,type);
-      }
-      const appearance='{"theme":"ordinary","coverMode":"poster"}';
-      db.prepare('INSERT INTO event_occurrence_overrides(event_id,original_date,cover_path,appearance,created_at,updated_at) VALUES (?,?,?,?,?,?)')
-        .run('demo-congress-series','2026-11-16','/assets/panel/6713c.png',appearance,Date.now(),Date.now());
-      const saturnalia=db.prepare("SELECT cover_path,appearance FROM event_types WHERE id='demo-saturnalia'").get();
-      db.prepare("UPDATE event_types SET cover_path='/assets/panel/6713c.png' WHERE id='demo-congress'").run();
-      seedDemo(file);
-      assert.equal(db.prepare("SELECT cover_path FROM event_types WHERE id='demo-congress'").get().cover_path,'/assets/panel/6713c.png');
-      const override=db.prepare("SELECT cover_path,appearance FROM event_occurrence_overrides WHERE event_id='demo-congress-series'").get();
-      assert.deepEqual(override,{cover_path:'/assets/panel/6713c.png',appearance});
-      assert.deepEqual(db.prepare("SELECT cover_path,appearance FROM event_types WHERE id='demo-saturnalia'").get(),saturnalia);
-    } finally { db.close(); }
   });
 } catch (error) {
   console.error(error);

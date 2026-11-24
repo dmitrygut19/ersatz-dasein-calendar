@@ -4,7 +4,7 @@
 // sync, manual events are never overwritten silently — matches wait for an explicit decision.
 import { randomBytes, randomUUID } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
-import { getDb, importGeneration, resetDemoImports } from './db';
+import { getDb, importGeneration } from './db';
 import { calendarSettings, events, eventTypeUsage, externalSources, importMatches, occurrenceOverrides } from './db/schema';
 import { HttpError } from './http';
 import { authUrl, exchangeCode, listCalendars, listEvents, refreshAccessToken, requireGoogle, type ExternalEvent, type GoogleTokens } from './google';
@@ -12,9 +12,8 @@ import { fetchYandexEvents, validateCreds, type YandexCreds } from './caldav';
 import { refreshSuggestions, clearSkips } from './recognition';
 import { syncSchedulerStatus } from './sync-scheduler';
 import { fetchICalFeed, validateFeedUrl, type FeedProvider } from './ical-feed';
-import { publicDemoEnabled } from './public-demo';
 import { externalEventDefault, type ExternalEventDefault } from './external-event-defaults';
-import { sharedCalendarEnabled } from './shared-calendar';
+import { lockedFeedUrl } from './deployment-mode';
 
 const SYNC_BACK_MS = 190 * 24 * 3600 * 1000;
 const SYNC_FORWARD_MS = 370 * 24 * 3600 * 1000;
@@ -54,7 +53,7 @@ export type Provider = 'google' | 'yandex';
 export async function connectICal(provider: FeedProvider, value: unknown) {
   const db = getDb(), generation = importGeneration(db);
   const url = validateFeedUrl(value, provider);
-  if (sharedCalendarEnabled() && url !== process.env.CALENDAR_SHARED_FEED_URL) throw new HttpError(422, 'Этот общий стенд подключён к публичному календарю сообщества. Личный источник здесь подключать нельзя.');
+  if (lockedFeedUrl() && url !== lockedFeedUrl()) throw new HttpError(422, 'Этот общий стенд подключён к публичному календарю сообщества. Личный источник здесь подключать нельзя.');
   // Check the new feed before replacing a working connection.
   const probe = await fetchICalFeed(url, provider, new Date(Date.now() - SYNC_BACK_MS), new Date(Date.now() + SYNC_FORWARD_MS));
   if (importGeneration(db) !== generation) throw new HttpError(409, 'Временное подключение сброшено при обновлении страницы. Подключите календарь заново.');
@@ -63,7 +62,7 @@ export async function connectICal(provider: FeedProvider, value: unknown) {
 }
 
 export function startConnect(origin: string) {
-  if (sharedCalendarEnabled()) throw new HttpError(422, 'На общем стенде используется публичный iCal календаря сообщества.');
+  if (lockedFeedUrl()) throw new HttpError(422, 'На общем стенде используется публичный iCal календаря сообщества.');
   requireGoogle();
   const state = randomBytes(16).toString('hex');
   setSetting('oauth_state', state);
@@ -92,7 +91,7 @@ export async function finishConnect(code: string, state: string, origin: string)
 }
 
 export async function connectYandex(input: unknown) {
-  if (sharedCalendarEnabled()) throw new HttpError(422, 'На общем стенде используется публичный iCal календаря сообщества.');
+  if (lockedFeedUrl()) throw new HttpError(422, 'На общем стенде используется публичный iCal календаря сообщества.');
   const creds = validateCreds(input);
   // Validate the credentials and discover the calendar before storing anything.
   const probe = await fetchYandexEvents(creds, new Date(Date.now() - 24 * 3600 * 1000), new Date(Date.now() + 48 * 3600 * 1000));
@@ -123,7 +122,6 @@ function parseTokens(raw: string): GoogleTokens {
 }
 
 export function disconnect() {
-  if (publicDemoEnabled() && !sharedCalendarEnabled()) { resetDemoImports(); return getStatus(); }
   const db = getDb();
   // Imported events stay in the product (decision); only the connection and tokens go away.
   db.delete(externalSources).run();

@@ -14,9 +14,10 @@ services:
         value: "24.18.0"
       - key: HOST
         value: "0.0.0.0"
-      - key: CALENDAR_DEMO_REMOTE
+      - key: CALENDAR_ALLOW_REMOTE
         value: "1"
-      - key: CALENDAR_PUBLIC_DEMO
+      # Admin open without login until Telegram login is connected. Set "0" to require the secret link.
+      - key: CALENDAR_ADMIN_OPEN
         value: "1"
       - key: CALENDAR_EXPERIMENT
         value: "local"

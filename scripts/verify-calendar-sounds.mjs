@@ -11,7 +11,7 @@ const directory=mkdtempSync(path.resolve('artifacts/calendar-sounds-'));
 const socket=createServer();socket.listen(0,'127.0.0.1');await once(socket,'listening');
 const port=socket.address().port;await new Promise(resolve=>socket.close(resolve));
 const base=`http://127.0.0.1:${port}`;
-const server=spawn(process.execPath,['scripts/render-start.mjs'],{env:{...process.env,HOST:'127.0.0.1',PORT:String(port),CALENDAR_PUBLIC_DEMO:'1',CALENDAR_DEMO_REMOTE:'1',CALENDAR_EXPERIMENT:'',CALENDAR_EXPERIMENT_TOKEN:'',CALENDAR_PUBLIC_DEMO_DIRECTORY:path.join(directory,'demo')},stdio:'ignore'});
+const server=spawn(process.execPath,['scripts/render-start.mjs'],{env:{...process.env,HOST:'127.0.0.1',PORT:String(port),CALENDAR_ADMIN_OPEN:'1',CALENDAR_ALLOW_REMOTE:'1',CALENDAR_PUBLIC_DEMO:'',CALENDAR_DEMO_REMOTE:'',CALENDAR_EXPERIMENT:'',CALENDAR_EXPERIMENT_TOKEN:'',CALENDAR_DATABASE_PATH:path.join(directory,'calendar.sqlite')},stdio:'ignore'});
 let browser;const checks=[],errors=[];
 try{
  for(let i=0;i<80;i++){try{if((await fetch(base+'/calendar')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}

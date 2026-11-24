@@ -9,7 +9,6 @@
     "prebuild": "node scripts/generate-tokens.mjs && node scripts/generate-admin-lino.mjs",
     "build": "node scripts/astro.mjs build",
     "start": "node dist/server/entry.mjs",
-    "demo": "node scripts/local-demo.mjs",
     "test": "node scripts/verify.mjs",
     "backup": "node scripts/backup-db.mjs",
     "test:ui": "node scripts/verify-ui.mjs",

@@ -24,7 +24,7 @@ node --env-file=.env dist/server/entry.mjs
 
 CALENDAR_EXPERIMENT=local и токен длиной от 32 символов включают временный адаптер. Вход: https://<адрес-приложения>/#<токен>. Фрагмент обменивается на HttpOnly-cookie. Это временный вход, а не Telegram-авторизация. Без адаптера административные маршруты закрыты.
 
-CALENDAR_DEMO_REMOTE=1 разрешает внешний домен. При прямом запуске dist/server/entry.mjs этот флаг сам не включает открытое демо. В render-start.mjs поведение другое — см. ниже.
+CALENDAR_ALLOW_REMOTE=1 разрешает внешний домен для админки и API (иначе они отвечают только на localhost). CALENDAR_ADMIN_OPEN=1 открывает админку и её API без входа — временное решение до Telegram-авторизации; при CALENDAR_ADMIN_OPEN=0 вход только по секретной ссылке.
 
 Новая обычная база получает миграции, но не готовое наполнение. Существующие данные переносятся через SQLite backup; новый источник подключается в админке. Ручные типы и события создаются там же.
 
@@ -32,12 +32,12 @@ CALENDAR_DEMO_REMOTE=1 разрешает внешний домен. При пр
 
 - HOST, PORT — адрес/порт процесса.
 - CALENDAR_DATABASE_PATH — обычная БД, по умолчанию data/experiment.sqlite.
-- CALENDAR_PUBLIC_DEMO — 1 включает демо; для обычного режима задать 0.
-- CALENDAR_DEMO_REMOTE — 1 разрешает внешний домен в middleware.
-- CALENDAR_EXPERIMENT, CALENDAR_EXPERIMENT_TOKEN — временный вход.
+- CALENDAR_ADMIN_OPEN — 1 открывает админку без входа; по умолчанию закрыта.
+- CALENDAR_ALLOW_REMOTE — 1 разрешает внешний домен для админки и API.
+- CALENDAR_EXPERIMENT, CALENDAR_EXPERIMENT_TOKEN — временный вход по секретной ссылке.
 - CALENDAR_SYNC_INTERVAL_MS — синхронизация, по умолчанию 60000.
-- CALENDAR_SHARED_CALENDAR, CALENDAR_SHARED_DATABASE_PATH, CALENDAR_SHARED_FEED_URL — общий демо-источник.
-- CALENDAR_PUBLIC_DEMO_DIRECTORY — база изолированного демо.
+- CALENDAR_SHARED_FEED_URL — закреплённый iCal сообщества: админка не может заменить его другим источником. render-start.mjs задаёт его из config/community-calendar.json.
+- Устаревшие CALENDAR_PUBLIC_DEMO=1 и CALENDAR_DEMO_REMOTE=1 по-прежнему понимаются как CALENDAR_ADMIN_OPEN=1 и CALENDAR_ALLOW_REMOTE=1, чтобы ранее настроенный хост не сломался. CALENDAR_SHARED_CALENDAR, CALENDAR_SHARED_DATABASE_PATH и CALENDAR_PUBLIC_DEMO_DIRECTORY больше не используются.
 - CALENDAR_BACKUP_DIR, CALENDAR_BACKUPS_KEEP — каталог/число копий, по умолчанию backups и 14.
 - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET — старый OAuth; для iCal не нужны.
 
@@ -49,7 +49,7 @@ SQLite хранить на постоянном диске. Seed-скрипты 
 npm run backup
 ```
 
-Backup читает CALENDAR_DATABASE_PATH. Для общего источника явно передать в него фактический CALENDAR_SHARED_DATABASE_PATH. Shell или менеджер процессов должен загрузить переменные: backup сам не читает .env. Для резервного копирования используется online backup SQLite.
+Backup читает CALENDAR_DATABASE_PATH. Shell или менеджер процессов должен загрузить переменные: backup сам не читает .env. Для резервного копирования используется online backup SQLite.
 
 Перед заменой базы остановить приложение, использовать проверенную копию и проверить запуск. Один файл, скопированный из работающей WAL-базы, не гарантирует полный снимок.
 
@@ -57,11 +57,11 @@ CALENDAR_BACKUPS_KEEP должен быть целым числом от 1. Не
 
 ## Действующий стенд
 
-render.yaml сохраняет прежний бесплатный Render-сервис и scripts/render-start.mjs. Launcher читает .env, подготавливает демо и выбирает общий источник из config/community-calendar.json. Режимы описаны в architecture.md.
+render.yaml описывает бесплатный Render-сервис и scripts/render-start.mjs. Launcher читает .env, при первом запуске базы загружает снимок из config/community-calendar.json (повторный запуск данные не перезаписывает), закрепляет этот iCal как источник и сразу обновляет его из Google; дальше работает фоновая синхронизация. База — CALENDAR_DATABASE_PATH, по умолчанию data/calendar.sqlite.
 
 Диск бесплатного стенда эфемерен: внутренние настройки не гарантированы после redeploy/restart. Для постоянной работы нужны постоянный диск, backup и рабочая авторизация. Уборка репозитория настройки стенда не меняет.
 
-Перед рабочим запуском заменить startCommand на `npm start` (или прямой запуск Node с загруженным .env), установить CALENDAR_PUBLIC_DEMO=0 и CALENDAR_SHARED_CALENDAR=0, указать CALENDAR_DATABASE_PATH на постоянном диске. Не использовать render-start.mjs для рабочей базы: это launcher демонстрации с seed. Отключить временный CALENDAR_EXPERIMENT после подключения доверенной серверной идентификации Telegram/сессии; без новой интеграции это закроет админку. Само выключение демо не реализует Telegram-вход. Не переносить в рабочую систему параметры demoMember/participant как доказательство личности.
+Для рабочего запуска указать CALENDAR_DATABASE_PATH на постоянном диске; render-start.mjs подходит и для него (снимок загружается только в пустую базу). Чтобы закрыть админку, установить CALENDAR_ADMIN_OPEN=0 и удалить устаревший CALENDAR_PUBLIC_DEMO, если он задан в настройках хоста: вход останется по секретной ссылке. Отключить временный CALENDAR_EXPERIMENT после подключения доверенной серверной идентификации Telegram/сессии; без новой интеграции это закроет админку полностью. Не переносить в рабочую систему параметр participant как доказательство личности.
 
 ## Основной сайт
 
