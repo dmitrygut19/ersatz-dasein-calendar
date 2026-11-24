@@ -86,12 +86,14 @@ export function updateScopedEvent(id: string, input: unknown) {
   if (settings.url && !/^https?:\/\//.test(settings.url)) throw new HttpError(422, 'Введите ссылку http:// или https://.');
   if ('date' in patch && (typeof patch.date !== 'string' || !validDate(patch.date))) throw new HttpError(422, 'Проверьте дату.');
   for (const key of ['start','end']) if (key in patch && (typeof patch[key] !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(patch[key]))) throw new HttpError(422, 'Проверьте время.');
-  if ((patch.start ?? current.start) === (patch.end ?? current.end)) throw new HttpError(422, 'Начало и конец не должны совпадать.');
+  // Only a time edit can create a zero interval; all-day imports are stored as 00:00–00:00.
+  const timeEdit = 'start' in patch || 'end' in patch;
+  if (timeEdit && (patch.start ?? current.start) === (patch.end ?? current.end)) throw new HttpError(422, 'Начало и конец не должны совпадать.');
   if (!Object.keys(patch).length) return event;
   return db.transaction(tx => {
     const overrides = tx.select().from(occurrenceOverrides).where(eq(occurrenceOverrides.eventId, eventId)).all();
     if (raw.scope === 'series') {
-      if ((patch.start ?? event.startTime) === (patch.end ?? event.endTime)) throw new HttpError(422, 'Изменение создаёт нулевой интервал серии.');
+      if (timeEdit && (patch.start ?? event.startTime) === (patch.end ?? event.endTime)) throw new HttpError(422, 'Изменение создаёт нулевой интервал серии.');
       const delta = 'date' in patch ? Math.round((Date.parse(`${patch.date}T12:00Z`) - Date.parse(`${current.date}T12:00Z`)) / 86400000) : 0;
       const defaults = { ...event.settings, ...settings };
       if (settings.appearance && appearancePatch) {
@@ -115,7 +117,7 @@ export function updateScopedEvent(id: string, input: unknown) {
         for (const key of ['coverPath','appearance','accessLabel','points'] as const) if (key in settings && (key !== 'appearance' || settings.appearance === null)) Object.assign(changed, { [key]: null });
         const effectiveStart = changed.startTime ?? row.startTime ?? event.startTime;
         const effectiveEnd = changed.endTime ?? row.endTime ?? event.endTime;
-        if (effectiveStart === effectiveEnd) throw new HttpError(422, 'Изменение создаёт нулевой интервал одного из выпусков.');
+        if (timeEdit && effectiveStart === effectiveEnd) throw new HttpError(422, 'Изменение создаёт нулевой интервал одного из выпусков.');
         tx.update(occurrenceOverrides).set(changed).where(and(eq(occurrenceOverrides.eventId,eventId),eq(occurrenceOverrides.originalDate,row.originalDate))).run();
       }
       const saved = tx.update(events).set({ ...metadata, settings: defaults, updatedAt: now,
