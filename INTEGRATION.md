@@ -30,7 +30,7 @@
 - /api/events/assign-type — назначение типа.
 - /api/lodges, /api/groups, /api/groups/:id — ложи и группы.
 - /api/calendar-preview — защищённое превью.
-- /api/covers — POST загрузка; GET галерея; DELETE JSON {coverPath} убирает обложку из галереи. Назначенные обложки и сами изображения сохраняются. Список исключений хранится в calendar_settings; маршрут требует административного доступа вне демо.
+- /api/covers — POST загрузка; GET галерея; DELETE JSON {coverPath} убирает обложку из галереи. Назначенные обложки и сами изображения сохраняются. Список исключений хранится в calendar_settings; маршрут требует административного доступа.
 - /api/integration — статус, синхронизация и отключение.
 - POST /api/integration/connect — {provider: "google" | "yandex", url: "https://..."}.
 - /api/integration/matches, /api/integration/matches/:id — сопоставление импорта.

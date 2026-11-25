@@ -1,11 +1,13 @@
 // SQLite backup: uses better-sqlite3's online backup API (WAL-safe) and keeps
-// the newest N copies. Run: npm run backup
+// the newest N copies. Run: npm run backup (reads .env like npm start; set variables win).
 import Database from 'better-sqlite3';
-import { mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 
-const source = path.resolve(process.env.CALENDAR_DATABASE_PATH ?? 'data/experiment.sqlite');
+if (existsSync('.env')) process.loadEnvFile('.env');
+// Same default as npm start (scripts/render-start.mjs).
+const source = path.resolve(process.env.CALENDAR_DATABASE_PATH ?? 'data/calendar.sqlite');
 const dir = path.resolve(process.env.CALENDAR_BACKUP_DIR ?? 'backups');
 const keep = Number(process.env.CALENDAR_BACKUPS_KEEP ?? 14);
 if (!Number.isSafeInteger(keep) || keep < 1) throw new Error('CALENDAR_BACKUPS_KEEP must be a positive integer.');
@@ -14,6 +16,10 @@ if (source.includes(`${path.sep}calendar-app${path.sep}`)) throw new Error('Refu
 const stamp = new Date().toISOString().replace(/[:T]/g, '-');
 const target = path.join(dir, `backup-${stamp}-${randomUUID()}.sqlite`);
 // A typo must fail, rather than create an empty database and rotate good copies.
+if (!existsSync(source)) {
+  console.error(`База не найдена: ${source}. Укажите CALENDAR_DATABASE_PATH (в .env или окружении) — тот же путь, что у работающего приложения.`);
+  process.exit(1);
+}
 const db = new Database(source, { readonly: true, fileMustExist: true });
 try {
   mkdirSync(dir, { recursive: true });

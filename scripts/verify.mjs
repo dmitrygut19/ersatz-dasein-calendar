@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
+import http from 'node:http';
 import { once } from 'node:events';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,12 +33,14 @@ async function stop() {
   server.kill();
   await closed;
 }
-async function start(enabled) {
+async function start(enabled, extraEnv = {}) {
   const port = await freePort();
   base = `http://127.0.0.1:${port}`;
   const env = { ...process.env, NODE_ENV: 'production', HOST: '127.0.0.1', PORT: String(port), CALENDAR_DATABASE_PATH: databaseFile };
   delete env.CALENDAR_EXPERIMENT;
   delete env.CALENDAR_EXPERIMENT_TOKEN;
+  for (const key of ['CALENDAR_ADMIN_OPEN', 'CALENDAR_ALLOW_REMOTE', 'CALENDAR_PUBLIC_DEMO', 'CALENDAR_DEMO_REMOTE']) delete env[key];
+  Object.assign(env, extraEnv);
   if (enabled) Object.assign(env, { CALENDAR_EXPERIMENT: 'local', CALENDAR_EXPERIMENT_TOKEN: token });
   server = spawn(process.execPath, ['dist/server/entry.mjs'], { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'] });
   server.stdout.on('data', data => { output += data; });
@@ -64,6 +67,13 @@ async function request(route, { auth = true, method = 'GET', body, origin = base
   if (!['GET', 'HEAD'].includes(method) && origin !== null) allHeaders.Origin = origin;
   if (body !== undefined || rawBody !== undefined) allHeaders['Content-Type'] ??= 'application/json';
   return fetch(base + route, { method, headers: allHeaders, body: rawBody ?? (body === undefined ? undefined : JSON.stringify(body)), signal: AbortSignal.timeout(5000), redirect: 'manual' });
+}
+// Raw HTTP so the Host header can be set (fetch does not allow it).
+function rawStatus(route, headers) {
+  return new Promise((resolve, reject) => {
+    const req = http.request(base + route, { headers: { Authorization: `Bearer ${token}`, ...headers } }, res => { res.resume(); resolve(res.statusCode); });
+    req.on('error', reject); req.setTimeout(5000, () => req.destroy(new Error('timeout'))); req.end();
+  });
 }
 async function list() { const response = await request('/api/types'); assert.equal(response.status, 200); return (await response.json()).types; }
 function withDb(action) { const db = new Database(databaseFile); try { return action(db); } finally { db.close(); } }
@@ -92,6 +102,14 @@ try {
     for (const origin of ['https://untrusted.example', null]) {
       assert.equal((await request('/api/types', { method: 'POST', body: { name: 'Blocked' }, origin })).status, 403);
     }
+  });
+  await check('Without CALENDAR_ALLOW_REMOTE admin and API refuse requests addressed to a public host', async () => {
+    assert.equal(await rawStatus('/api/types', {}), 200);
+    assert.equal(await rawStatus('/api/types', { Host: 'calendar.example' }), 403);
+    assert.equal(await rawStatus('/admin', { Host: 'calendar.example' }), 403);
+    assert.equal(await rawStatus('/api/types', { 'X-Forwarded-Host': 'calendar.example' }), 403);
+    assert.equal(await rawStatus('/api/types', { 'X-Forwarded-For': '203.0.113.7' }), 403);
+    assert.equal(await rawStatus('/calendar', { Host: 'calendar.example' }), 200, 'The public calendar page stays reachable.');
   });
   await check('Session login rejects invalid token shapes and wrong values', async () => {
     for (const value of [null, {}, 123, 'forged']) {
@@ -628,6 +646,12 @@ try {
     assert.equal(item.typeName, appearanceType.name);
     assert.equal(item.access, 'Индивидуальная группа'); assert.equal(item.cover, null);
     assert.deepEqual(item.appearance, (await publicItems()).find(e => e.id.startsWith(appearanceEvent)).appearance);
+  });
+  await check('CALENDAR_ALLOW_REMOTE=1 accepts a public host behind a proxy', async () => {
+    await stop(); await start(true, { CALENDAR_ALLOW_REMOTE: '1' });
+    assert.equal(await rawStatus('/api/types', { Host: 'calendar.example', 'X-Forwarded-Proto': 'https', 'X-Forwarded-For': '203.0.113.7' }), 200);
+    const response = await request('/api/types', { method: 'POST', body: { name: 'Через прокси' }, origin: 'https://calendar.example', headers: { 'X-Forwarded-Proto': 'https', 'X-Forwarded-Host': 'calendar.example' } });
+    assert.equal(response.status, 200, await response.text());
   });
   await check('Calendar account shows recognized degree data; anonymous activity does not sign a guest in', async () => {
     const guest = await (await request('/api/calendar?participant=guest-1', { auth: false })).json();
