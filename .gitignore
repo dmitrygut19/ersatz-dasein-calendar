@@ -16,3 +16,7 @@ backups/
 *.log
 .DS_Store
 Thumbs.db
+
+# Google service-account keys for write-back are secrets
+service-account*.json
+*-service-account.json

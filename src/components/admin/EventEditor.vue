@@ -18,7 +18,7 @@ import LinoSpinner from '../ui/LinoSpinner.vue';
 const modern=useAdminLino();
 
 type RepeatRuleState = { freq: string; interval: number; byWeekday: number[]; until: string | null; count: number | null };
-const props = defineProps<{ scene: string; typeNames: string[]; types?: any[]; lodges?: {id:string;name:string;iconUrl:string|null}[]; initialDate?: string; startAppearance?: boolean; busy?: boolean; serverError?: string; initial?: (DemoEvent & { repeatRule?: unknown | null }) | null }>();
+const props = defineProps<{ scene: string; typeNames: string[]; types?: any[]; lodges?: {id:string;name:string;iconUrl:string|null}[]; initialDate?: string; startAppearance?: boolean; busy?: boolean; serverError?: string; googleWrite?: boolean; initial?: (DemoEvent & { repeatRule?: unknown | null }) | null }>();
 const emit = defineEmits<{ save: [event: DemoEvent & { repeatRule: unknown | null; scope: string; changes: Record<string,unknown>; degree: string|null; topicLodgeId: string|null; audienceLodgeIds: string[] }]; close: []; assignType: [name:string] }>();
 
 const editing = computed(() => Boolean(props.initial));
@@ -29,6 +29,8 @@ const type = ref(source?.typeName && props.typeNames.includes(source.typeName) ?
 const date = ref(source?.date ?? (props.initialDate || new Intl.DateTimeFormat('sv-SE', {timeZone:'Europe/Moscow'}).format(new Date())));
 const start = ref(source?.start ?? '19:00'), end = ref(source?.end ?? '20:30'), link = ref(source?.ownUrl ?? source?.url ?? ''), description = ref(source?.description ?? '');
 const external = Boolean(source && source.source !== 'Админка');
+// Fields owned by Google stay read-only unless write-back to Google is enabled on the server.
+const locked = external && !props.googleWrite;
 const degree = ref(source?.degreeOverride ? source.typeDegree ?? '' : 'inherit');
 const topic = ref(source?.communityEvent ? '__community' : source?.topicLodgeId ?? '');
 const affiliationDegree = ref(source?.affiliationDegree ?? '');
@@ -94,7 +96,7 @@ function save(scope = '') {
   const customRepeat = `Интервал ${interval.value} ${unit.value.toLowerCase()} · ${days.value.join(', ')} · ${finish.value === 'date' ? `до ${until.value}` : finish.value === 'count' ? `после ${count.value} повторений` : 'без даты окончания'}`;
   if (source?.repeatRule && !scope) { chooseScope.value=true; return; }
   const changes: Record<string,unknown> = {};
-  if (source && !external) for (const [key,value,original] of [['title',name.value.trim(),source.title],['date',date.value,source.date],['start',start.value,source.start],['end',end.value,source.end],['url',link.value,source.ownUrl ?? source.url],['description',description.value,source.description]]) if (value !== original) changes[key as string]=value;
+  if (source && !locked) for (const [key,value,original] of [['title',name.value.trim(),source.title],['date',date.value,source.date],['start',start.value,source.start],['end',end.value,source.end],['url',link.value,source.ownUrl ?? source.url],['description',description.value,source.description]]) if (value !== original) changes[key as string]=value;
   const desiredDegree = degree.value === 'inherit' ? null : degree.value;
   if (desiredDegree !== (source?.degreeOverride ? source.typeDegree ?? '' : null)) changes.degree=desiredDegree;
   const topicId = topic.value === '__community' ? null : topic.value || null;
@@ -124,17 +126,18 @@ function save(scope = '') {
   <form v-show="!appearanceOpen" v-lino-surface="!modern" class="admin-panel editor-panel" :class="{'admin-event-lino':!modern}" :aria-busy="busy" @submit.prevent="save()">
     <div class="panel-heading"><h2>{{ editing ? 'Редактировать событие' : 'Добавить событие' }}</h2><button class="close-button" type="button" aria-label="Свернуть добавление события" @click="emit('close')">−</button></div>
     <p v-if="editing" class="demo-note">{{ source?.repeatRule ? 'Выпуск серии' : 'Разовое событие' }} · {{ source?.title }} · {{ source?.date }} · {{ source?.start }} МСК</p>
+    <p v-if="external" class="demo-note">{{ locked ? 'Название, дату, время, ссылку и описание меняйте в Google Календаре.' : 'Название, дата, время, ссылка и описание сохранятся в Google Календаре.' }}</p>
     <fieldset :disabled="busy || chooseScope" class="editor-fields">
-    <FigmaField id="event-name" v-model="name" label="Название" :disabled="external" :max-length="120" required/>
+    <FigmaField id="event-name" v-model="name" label="Название" :disabled="locked" :max-length="120" required/>
     <FigmaField id="event-type" v-model="type" label="Тип" type="select" :options="typeOptions" :helper="editing ? 'Тип назначается сразу всей серии; остальные поля сохраняются кнопкой ниже.' : undefined" @update:model-value="editing && emit('assignType', $event)"/>
-    <FigmaField id="event-date" v-model="date" label="Дата (МСК)" :readonly="external" type="date" required/>
+    <FigmaField id="event-date" v-model="date" label="Дата (МСК)" :readonly="locked" type="date" required/>
     <p v-if="scene === 'event-past'" class="field-helper field-error">Дата в прошлом: событие сохранится как прошедшее, уведомления не уйдут.</p>
-    <div class="two-fields"><FigmaField id="event-start" v-model="start" label="Начало (МСК)" :readonly="external" type="time" required/><FigmaField id="event-end" v-model="end" label="Конец (МСК)" :readonly="external" type="time" required/></div>
+    <div class="two-fields"><FigmaField id="event-start" v-model="start" label="Начало (МСК)" :readonly="locked" type="time" required/><FigmaField id="event-end" v-model="end" label="Конец (МСК)" :readonly="locked" type="time" required/></div>
     <FigmaField v-if="!editing && modern" id="event-repeat" :model-value="repeat" label="Повтор" type="select" :options="repeatMenuOptions(date).map(value=>({label:value,value}))" @update:model-value="selectRepeat(String($event))"/>
     <div v-else-if="!editing" class="field repeat-field"><label for="event-repeat">Повтор</label><button id="event-repeat" class="repeat-trigger" type="button" aria-haspopup="listbox" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen"><span>{{ repeat }}</span><img src="/assets/input/chevron-default.svg" width="24" height="24" alt=""/></button><RepeatMenu v-if="menuOpen" :date="date" :selected="repeat" @select="selectRepeat" @close="menuOpen = false"/></div>
     <RepeatSettings v-if="custom && !editing" v-model:interval="interval" v-model:unit="unit" v-model:days="days" v-model:finish="finish" v-model:until="until" v-model:count="count" @save="custom = false"/>
-    <FigmaField id="event-link" v-model="link" label="Ссылка на площадку" :disabled="external" helper="Ссылка хранится у события. Пустое поле означает отсутствие ссылки."/>
-    <FigmaField id="event-description" v-model="description" label="Описание" :readonly="external" type="textarea" :max-length="2000"/>
+    <FigmaField id="event-link" v-model="link" label="Ссылка на площадку" :disabled="locked" helper="Ссылка хранится у события. Пустое поле означает отсутствие ссылки."/>
+    <FigmaField id="event-description" v-model="description" label="Описание" :readonly="locked" type="textarea" :max-length="2000"/>
     <LinoSeparator/><FigmaField id="event-degree" v-model="degree" label="Требуемый градус участников" type="select" :options="degreeOptions"/>
     <FigmaField id="event-lodge" v-model="topic" label="Тематическая ложа" type="select" :options="[{value:'',label:'Принадлежность не указана'},{value:'__community',label:'Общие события сообщества'},...(lodges ?? []).map(lodge=>({value:lodge.id,label:lodge.name}))]"/>
     <FigmaField id="event-affiliation-degree" v-model="affiliationDegree" label="Градус принадлежности события" type="select" :options="[{value:'',label:'Без конкретного градуса'},...['I','II','III'].map(value=>({value,label:value}))]" helper="Для фильтра расписания. Не меняет требования к участникам."/>

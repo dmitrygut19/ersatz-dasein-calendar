@@ -40,6 +40,16 @@ CALENDAR_ALLOW_REMOTE=1 разрешает внешний домен для ад
 - Устаревшие CALENDAR_PUBLIC_DEMO=1 и CALENDAR_DEMO_REMOTE=1 по-прежнему понимаются как CALENDAR_ADMIN_OPEN=1 и CALENDAR_ALLOW_REMOTE=1, чтобы ранее настроенный хост не сломался. CALENDAR_SHARED_CALENDAR, CALENDAR_SHARED_DATABASE_PATH и CALENDAR_PUBLIC_DEMO_DIRECTORY больше не используются.
 - CALENDAR_BACKUP_DIR, CALENDAR_BACKUPS_KEEP — каталог/число копий, по умолчанию backups и 14.
 - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET — старый OAuth; для iCal не нужны.
+- GOOGLE_SERVICE_ACCOUNT_FILE (или GOOGLE_SERVICE_ACCOUNT_JSON) — ключ сервисного аккаунта для записи в Google; GOOGLE_CALENDAR_ID — если календарь не определяется по iCal-ссылке; CALENDAR_TIMEZONE — часовой пояс записываемого времени (по умолчанию Europe/Moscow).
+
+## Запись в Google
+
+1. В Google Cloud создать проект, включить Google Calendar API, создать сервисный аккаунт и скачать ключ JSON. Ключ — секрет: хранить только на сервере, не в Git.
+2. Владелец календаря сообщества открывает доступ к календарю для адреса сервисного аккаунта (…@…iam.gserviceaccount.com) с правом «Вносить изменения в мероприятия».
+3. На сервере задать GOOGLE_SERVICE_ACCOUNT_FILE=/путь/к/ключу.json и закрыть админку: CALENDAR_ADMIN_OPEN=0 (вход по секретной ссылке или будущий Telegram). При открытой админке запись не включается — иначе любой посетитель мог бы менять календарь сообщества.
+4. Проверить: GET /api/integration возвращает googleWrite.enabled=true; в редакторе события из Google поля названия, даты, времени, ссылки и описания открыты, подсказка говорит «сохранятся в Google Календаре». Сначала проверить на отдельном тестовом календаре.
+
+Google обновляет iCal-ссылку с задержкой; записанные значения держатся в приложении, пока iCal их не покажет (не дольше 6 часов). Без прав Google вернёт отказ, и в приложении ничего не изменится.
 
 ## Данные
 

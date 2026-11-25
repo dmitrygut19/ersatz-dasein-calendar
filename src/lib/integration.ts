@@ -14,6 +14,8 @@ import { syncSchedulerStatus } from './sync-scheduler';
 import { fetchICalFeed, validateFeedUrl, type FeedProvider } from './ical-feed';
 import { externalEventDefault, type ExternalEventDefault } from './external-event-defaults';
 import { lockedFeedUrl } from './deployment-mode';
+import { googleWriteStatus, parseImportId, writeGoogleEvent, SCHEDULE_KEYS, type ScheduleChanges } from './google-write';
+import { getOccurrence, parseOccurrenceId } from './events';
 
 const SYNC_BACK_MS = 190 * 24 * 3600 * 1000;
 const SYNC_FORWARD_MS = 370 * 24 * 3600 * 1000;
@@ -44,6 +46,7 @@ export function getStatus() {
     pendingMatches,
     scheduler: syncSchedulerStatus(),
     connectionMethod: source?.calendarId.startsWith('ical:') ? 'ical' : source?.provider === 'yandex' ? 'caldav' : 'oauth',
+    googleWrite: googleWriteSummary(source),
   };
 }
 
@@ -196,6 +199,9 @@ function upsertIncoming(incoming: ExternalEvent[], provider: Provider, timeMin: 
   db.delete(importMatches).where(eq(importMatches.status, 'skip')).run();
   const manual = db.select().from(events).where(eq(events.source, 'manual')).all();
   const seen = new Set<string>();
+  const pending = pendingWrites();
+  incoming = incoming.map(item => withPendingWrite(item, pending));
+  savePendingWrites(pending);
   db.transaction(tx => {
     for (const item of incoming) {
       const assigned = externalEventDefault(defaults, calendarId, item.externalId);
@@ -307,4 +313,118 @@ export function resolveMatch(externalId: string, action: 'link' | 'import' | 'sk
     throw new HttpError(422, 'Выберите действие: связать, импортировать отдельно или пропустить.');
   }
   return { ok: true, status: getStatus() };
+}
+
+
+// ---- Write-back to Google -------------------------------------------------------------
+// Edits go to Google first; the local copy is updated at once. Google's iCal export lags
+// behind the API, so the written values are kept over stale feed data until the feed shows
+// them (or for PENDING_TTL), otherwise an edit would flip back on the next sync.
+const PENDING_KEY = 'google_pending_writes';
+const PENDING_TTL = 6 * 3600_000;
+type PendingFields = ScheduleChanges & { allDay?: boolean };
+type PendingWrites = Record<string, { fields: PendingFields; at: number }>;
+
+function googleWriteSummary(source: ReturnType<typeof sourceRow>) {
+  if (!source || source.provider !== 'google' || !source.calendarId.startsWith('ical:')) return { enabled: false, reason: 'Подключён не Google-календарь по iCal.' };
+  const { feedUrl } = JSON.parse(source.tokens || '{}') as { feedUrl?: string };
+  const status = googleWriteStatus(feedUrl);
+  return { enabled: status.enabled, reason: status.reason };
+}
+
+function pendingWrites(): PendingWrites {
+  try { return JSON.parse(setting(PENDING_KEY) ?? '{}') as PendingWrites; } catch { return {}; }
+}
+function savePendingWrites(value: PendingWrites) {
+  setSetting(PENDING_KEY, Object.keys(value).length ? JSON.stringify(value) : null);
+}
+function withPendingWrite(item: ExternalEvent, pending: PendingWrites): ExternalEvent {
+  const entry = pending[item.externalId];
+  if (!entry) return item;
+  const fields = entry.fields;
+  const caughtUp = (Object.keys(fields) as (keyof PendingFields)[]).every(key => (item as Record<string, unknown>)[key] === fields[key]);
+  if (caughtUp || Date.now() - entry.at > PENDING_TTL) { delete pending[item.externalId]; return item; }
+  return { ...item, ...fields };
+}
+
+/** Splits a scoped admin edit of an imported Google event into Google-owned and app-owned fields. */
+export function splitGoogleChanges(id: string, input: unknown) {
+  if (!input || typeof input !== 'object' || !('scope' in input)) return null;
+  const raw = input as { scope: unknown; changes?: unknown };
+  if (!raw.changes || typeof raw.changes !== 'object' || Array.isArray(raw.changes)) return null;
+  const changes = raw.changes as Record<string, unknown>;
+  if (!SCHEDULE_KEYS.some(key => key in changes)) return null;
+  const row = getDb().select().from(events).where(eq(events.id, parseOccurrenceId(id).eventId)).get();
+  if (!row || row.source !== 'google' || !row.externalId || !row.externalCalendarId?.startsWith('ical:')) return null;
+  const schedule: Record<string, unknown> = {}, rest: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(changes)) ((SCHEDULE_KEYS as readonly string[]).includes(key) ? schedule : rest)[key] = value;
+  return { scope: raw.scope === 'series' ? 'series' as const : 'occurrence' as const, schedule, rest };
+}
+
+function validateSchedule(raw: Record<string, unknown>): ScheduleChanges {
+  const out: ScheduleChanges = {};
+  const text = (key: 'title' | 'description' | 'url', max: number) => {
+    if (!(key in raw)) return;
+    const value = raw[key];
+    if (typeof value !== 'string' || value.length > max) throw new HttpError(422, `Проверьте поле «${key}».`);
+    out[key] = value.trim();
+  };
+  text('title', 120); text('description', 2000); text('url', 300);
+  if ('title' in out && !out.title) throw new HttpError(422, 'Введите название.');
+  if (out.url && !/^https?:\/\//.test(out.url)) throw new HttpError(422, 'Введите ссылку http:// или https://.');
+  if ('date' in raw) {
+    if (typeof raw.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(raw.date) || Number.isNaN(Date.parse(`${raw.date}T12:00:00Z`))) throw new HttpError(422, 'Проверьте дату.');
+    out.date = raw.date;
+  }
+  for (const key of ['start', 'end'] as const) if (key in raw) {
+    if (typeof raw[key] !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(raw[key] as string)) throw new HttpError(422, 'Проверьте время.');
+    out[key] = raw[key] as string;
+  }
+  return out;
+}
+
+/** Writes title/description/link/date/time of an imported Google event to Google, then applies it locally. */
+export async function editGoogleEvent(id: string, scope: 'occurrence' | 'series', input: Record<string, unknown>) {
+  const changes = validateSchedule(input);
+  const source = sourceRow();
+  const { eventId } = parseOccurrenceId(id);
+  const row = getDb().select().from(events).where(eq(events.id, eventId)).get();
+  if (!source || !row?.externalId || !row.externalCalendarId) throw new HttpError(404, 'Событие уже удалено или не найдено.');
+  const { feedUrl } = JSON.parse(source.tokens || '{}') as { feedUrl?: string };
+  const current = getOccurrence(id);
+  const meta = (row.sourceMetadata ?? {}) as { allDay?: boolean; endDate?: string | null };
+  const localId = row.externalId.slice(row.externalCalendarId.length + 1);
+  const { allDay } = await writeGoogleEvent(feedUrl ?? null, localId, scope, changes,
+    { date: current.date, start: current.start, end: current.end, allDay: Boolean(meta.allDay), endDate: meta.endDate ?? null });
+  const db = getDb(), now = new Date();
+  const timeChange = 'date' in changes || 'start' in changes || 'end' in changes;
+  const { uid } = parseImportId(localId);
+  const prefix = `${row.externalCalendarId}:${uid}`;
+  const targets = scope === 'series'
+    ? db.select().from(events).where(eq(events.externalCalendarId, row.externalCalendarId)).all()
+      .filter(item => item.externalId === prefix || item.externalId?.startsWith(prefix + '@'))
+    : [row];
+  const pending = pendingWrites();
+  db.transaction(tx => {
+    for (const target of targets) {
+      const fields: PendingFields = {};
+      if ('title' in changes) fields.title = changes.title;
+      if ('description' in changes) fields.description = changes.description;
+      if ('url' in changes) fields.url = changes.url;
+      if (timeChange && target.id === row.id) {
+        fields.date = changes.date ?? current.date; fields.start = changes.start ?? current.start; fields.end = changes.end ?? current.end; fields.allDay = allDay;
+      }
+      tx.update(events).set({
+        ...(fields.title !== undefined ? { title: fields.title } : {}),
+        ...(fields.description !== undefined ? { description: fields.description } : {}),
+        ...(fields.url !== undefined ? { url: fields.url } : {}),
+        ...(fields.date !== undefined ? { startDate: fields.date, startTime: fields.start, endTime: fields.end,
+          sourceMetadata: { ...(target.sourceMetadata ?? {}), allDay, endDate: allDay ? (target.sourceMetadata as { endDate?: string } | null)?.endDate : undefined } } : {}),
+        updatedAt: now,
+      }).where(eq(events.id, target.id)).run();
+      if (target.externalId) pending[target.externalId] = { fields, at: Date.now() };
+    }
+  });
+  savePendingWrites(pending);
+  return db.select().from(events).where(eq(events.id, row.id)).get();
 }

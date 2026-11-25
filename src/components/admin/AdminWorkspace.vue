@@ -45,6 +45,7 @@ type IntegrationStatus = {
   connectionMethod: 'ical' | 'oauth' | 'caldav';
   state: 'none' | 'manual' | 'connected' | 'syncing' | 'error';
   provider: string; calendarSummary: string; lastSyncAt: string | null; lastSyncError: string | null; pendingMatches: number;
+  googleWrite?: { enabled: boolean; reason: string | null };
 };
 type MatchItem = {
   externalId: string; externalTitle: string; externalDate: string; externalStart: string; externalEnd: string;
@@ -455,7 +456,7 @@ onBeforeUnmount(() => { clearTimeout(timer); clearInterval(refreshTimer); docume
               <div v-if="scene === 'access' ? eventsLoaded && !untypedGroups.length : eventsLoaded && !events.length" class="empty-state"><h3>{{ scene === 'access' ? 'Все события распределены по типам' : 'Событий пока нет' }}</h3><p>{{ scene === 'access' ? 'Новые события без назначенного типа появятся здесь' : 'Добавьте первое событие вручную.' }}</p></div>
             </section>
             <aside class="workspace-aside"><p v-if="typeContext" class="demo-note">Новый тип для «{{typeContext.title}}»</p><TypesPanel ref="typePanel" :initial-types="currentTypes" :events="events" external-appearance @appearance="openAppearance()" @saved="refreshTypes" @created="queueTypeCreated" @cancelled="typeContext=null"/>
-              <EventEditor v-if="eventForm" :key="scene === 'event-edit' ? selected.id : scene + creationDate" :scene="scene" :type-names="typeNames" :types="currentTypes" :lodges="lodges" :initial-date="creationDate" :busy="eventSaving" :server-error="eventError" :initial="scene === 'event-edit' ? selected : null" @save="saveEvent" @assign-type="assignEventType(selected, $event)" @close="go('calendar')"/>
+              <EventEditor v-if="eventForm" :google-write="Boolean(integration?.googleWrite?.enabled)" :key="scene === 'event-edit' ? selected.id : scene + creationDate" :scene="scene" :type-names="typeNames" :types="currentTypes" :lodges="lodges" :initial-date="creationDate" :busy="eventSaving" :server-error="eventError" :initial="scene === 'event-edit' ? selected : null" @save="saveEvent" @assign-type="assignEventType(selected, $event)" @close="go('calendar')"/>
               <button v-else class="manual-event-button admin-panel" @click="creationDate=''; go('event-new')"><img src="/assets/panel/e7fb1.svg" width="18" height="18" alt=""/>Добавить событие вручную</button>
             </aside>
           </div>
@@ -495,7 +496,7 @@ onBeforeUnmount(() => { clearTimeout(timer); clearInterval(refreshTimer); docume
             </template>
           </div>
         </section>
-        <EventEditor v-else-if="['event-settings','appearance-event'].includes(scene)" :start-appearance="scene === 'appearance-event'" :key="selected.id" scene="event-edit" :type-names="typeNames" :types="currentTypes" :lodges="lodges" :initial="selected" :busy="eventSaving" :server-error="eventError" @save="saveEvent" @assign-type="assignEventType(selected, $event)" @close="go('event')"/>
+        <EventEditor v-else-if="['event-settings','appearance-event'].includes(scene)" :google-write="Boolean(integration?.googleWrite?.enabled)" :start-appearance="scene === 'appearance-event'" :key="selected.id" scene="event-edit" :type-names="typeNames" :types="currentTypes" :lodges="lodges" :initial="selected" :busy="eventSaving" :server-error="eventError" @save="saveEvent" @assign-type="assignEventType(selected, $event)" @close="go('event')"/>
         <section v-else-if="scene === 'event-delete'" class="event-detail confirm-delete" role="group" aria-label="Удаление события">
           <button class="close-button detail-close" aria-label="Отменить удаление события" :disabled="deleting" @click="go('event')">×</button>
           <h2>Удалить «{{ selected.title }}»?</h2>
