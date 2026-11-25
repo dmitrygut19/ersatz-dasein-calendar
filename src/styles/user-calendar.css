@@ -103,13 +103,7 @@
     --event-pager-muted:var(--cream-50) !important;
     --event-pager-hover:var(--cream-50) !important;
   }
-  .user-calendar--public .uc-day .uc-cover:has(img)::before,
-  .user-calendar--public .uc-day .uc-cover:has(img)::after {
-    content:''; position:absolute; inset-inline:0; z-index:1; pointer-events:none;
-    background:linear-gradient(var(--calendar-cover-shade-direction),color-mix(in srgb,var(--brown-900) 38%,transparent),color-mix(in srgb,var(--brown-900) 22%,transparent) 40%,color-mix(in srgb,var(--brown-900) 7%,transparent) 75%,transparent);
-  }
-  .user-calendar--public .uc-day .uc-cover:has(img)::before { top:0; height:calc(var(--cover-header-height,var(--space-8)) + var(--space-4)); --calendar-cover-shade-direction:to bottom; }
-  .user-calendar--public .uc-day .uc-cover:has(img)::after { bottom:0; height:calc(var(--cover-footer-height,var(--space-8)) + var(--space-4)); --calendar-cover-shade-direction:to top; }
+  /* No darkening over cover images (removed 2026-11-25): transparent artwork must stay clean; the light text shadow below keeps captions legible. */
   .user-calendar--public .uc-day:has(.uc-cover img) :is(.uc-day-head,.uc-caption,.uc-venue) { text-shadow:0 1px var(--space-1) color-mix(in srgb,var(--brown-900) 85%,transparent); }
   .user-calendar--public .uc-day:has(.uc-cover img) .uc-caret svg { filter:drop-shadow(0 1px 2px var(--brown-900)); }
   .user-calendar--public .uc-day:has(.uc-cover img) .uc-title { font-weight:var(--font-weight-semibold); }

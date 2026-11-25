@@ -12,7 +12,6 @@ import { matchesCalendarFilters } from '../../lib/calendar-filters';
 import { mobileEventColor } from '../../lib/mobile-event-color';
 import LinoIcon from '../ui/LinoIcon.vue';
 import { linoSurface as vLinoSurface } from '../../lib/lino-card-frame';
-import { calendarCoverShade as vCoverShade } from '../../lib/calendar-cover-shade';
 import 'lino-ui/rough';
 import '../../styles/lino-kit.css';
 import { buttonDefaults, defaultAppearance, type Appearance } from '../../lib/appearance';
@@ -493,7 +492,7 @@ onBeforeUnmount(() => {
                 </div>
               </div>
               <div v-if="!compact && cell.event" class="uc-event" :data-title="cell.event.title">
-                <button v-cover-shade type="button" class="uc-cover" :aria-pressed="!!selected && selectedCellIndex === index" :class="{'uc-cover-flat': cell.event.cover === '/assets/panel/a5ff5.png'}" :aria-label="`Открыть ${cell.event.title}`" @click="openEvent(cell.event, index)">
+                <button type="button" class="uc-cover" :aria-pressed="!!selected && selectedCellIndex === index" :class="{'uc-cover-flat': cell.event.cover === '/assets/panel/a5ff5.png'}" :aria-label="`Открыть ${cell.event.title}`" @click="openEvent(cell.event, index)">
                   <img v-if="cell.event.cover" :src="cell.event.cover" alt=""/>
                 </button>
                 <button type="button" class="uc-caption" :data-event-id="cell.event.id" :aria-pressed="!!selected && selectedCellIndex === index" :aria-label="`Открыть ${cell.event.title}`" @click="openEvent(cell.event, index)">
