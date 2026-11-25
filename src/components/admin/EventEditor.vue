@@ -86,7 +86,9 @@ function save(scope = '') {
   if (props.busy) return;
   error.value = '';
   if (!name.value.trim() || !date.value || !start.value || !end.value) { error.value = 'Заполните название, дату и время.'; return; }
-  if (end.value === start.value) { error.value = 'Начало и конец не должны совпадать.'; return; }
+  // All-day events are stored as 00:00–00:00; only an edited time can create a zero interval.
+  const keepsAllDay = Boolean(source?.allDay) && start.value === source?.start && end.value === source?.end;
+  if (end.value === start.value && !keepsAllDay) { error.value = 'Начало и конец не должны совпадать.'; return; }
   if (link.value && !/^https?:\/\//.test(link.value)) { error.value = 'Введите ссылку, начинающуюся с https:// или http://.'; return; }
   if (repeat.value === 'Настроить…' && finish.value === 'date' && until.value < date.value) { error.value = 'Дата окончания повторов должна быть не раньше даты события.'; return; }
   const customRepeat = `Интервал ${interval.value} ${unit.value.toLowerCase()} · ${days.value.join(', ')} · ${finish.value === 'date' ? `до ${until.value}` : finish.value === 'count' ? `после ${count.value} повторений` : 'без даты окончания'}`;

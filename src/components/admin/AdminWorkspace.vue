@@ -34,7 +34,7 @@ onBeforeUnmount(stopCalendarSoundInput);
 
 type ServerOccurrence = {
   sourceSeriesId: string | null; sourceCalendarId: string | null; allowedDegrees: string[] | null; requiresAuth: boolean; typeTier: string | null;
-  id: string; eventId: string; title: string; date: string; start: string; end: string;
+  id: string; eventId: string; title: string; date: string; start: string; end: string; allDay?: boolean;
   description: string; url: string; ownUrl: string; typeId: string | null; typeName: string | null;
   typeTheme: string | null; appearance: Appearance | null; accessOverride: boolean; pointsOverride: boolean;
   affiliationDegree: string|null; communityEvent:boolean;
@@ -159,7 +159,7 @@ const profilePeriod = ref('Последние 3 месяца');let timer: Return
 
 function toDemo(event: ServerOccurrence): DemoEvent {
   return {
-    id: event.id, eventId: event.eventId, typeId:event.typeId, sourceCalendarId:event.sourceCalendarId, sourceSeriesId:event.sourceSeriesId, allowedDegrees:event.allowedDegrees, requiresAuth:event.requiresAuth, typeTier:event.typeTier, title: event.title, date: event.date, start: event.start, end: event.end,
+    id: event.id, eventId: event.eventId, allDay: event.allDay ?? false, typeId:event.typeId, sourceCalendarId:event.sourceCalendarId, sourceSeriesId:event.sourceSeriesId, allowedDegrees:event.allowedDegrees, requiresAuth:event.requiresAuth, typeTier:event.typeTier, title: event.title, date: event.date, start: event.start, end: event.end,
     typeName: event.typeName ?? 'Без типа', source: event.source === 'google' ? 'Google Calendar' : event.source === 'yandex' ? 'Яндекс Календарь' : 'Админка',
     access: event.access, points: event.points, cover: event.cover ?? '',
     description: event.description, url: event.url, ownUrl: event.ownUrl, repeat: event.repeat, repeatRule: event.repeatRule ?? null,

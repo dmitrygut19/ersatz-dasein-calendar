@@ -36,5 +36,12 @@ await api(a,'/api/events/'+encodeURIComponent(allDay.id),{scope:'occurrence',cha
 await api(a,'/api/events/'+encodeURIComponent(allDay.id),{scope:'series',changes:{accessLabel:'Только III'}},'PUT');
 const shown=(await api(b,'/api/calendar'+range)).events.find(e=>e.id===allDay.id);assert.equal(shown.points,5);assert.equal(shown.cover,'/assets/panel/6713c.png');assert.equal(shown.canFollow,false);
 checks.push('All-day imported event: occurrence and series settings save and reach the public calendar');
+// The admin editor itself must not block saving an all-day event (00:00–00:00) with the zero-interval check.
+await page.setViewportSize({width:1440,height:1000});await page.goto(base+'/admin');
+const allDayCard=page.locator('.event-group-card',{hasText:'Весь день'});await expect(allDayCard).toHaveCount(1);
+await allDayCard.getByRole('button',{name:'Редактировать'}).click();await expect(page.locator('.editor-panel')).toBeVisible();
+await page.getByRole('button',{name:'Сохранить изменения'}).click();
+await expect(page.locator('.admin-toast')).toHaveText('Изменения сохранены.');await expect(page.locator('.editor-panel .field-error')).toHaveCount(0);
+checks.push('Admin editor saves an all-day imported event without the zero-interval error');
 assert.deepEqual(errors,[]);writeFileSync(path.join(directory,'report.json'),JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({directory,checks,errors}));
 }finally{await browser?.close();server.kill();}
