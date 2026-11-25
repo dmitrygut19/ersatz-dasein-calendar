@@ -23,7 +23,7 @@ npm start
 Переменные окружения сервера (можно скопировать `.env.example` в `.env`):
 
 ```sh
-CALENDAR_ALLOW_REMOTE=1   # админка и API отвечают по внешнему адресу, а не только с localhost
+CALENDAR_ALLOW_REMOTE=1   # админка и её API отвечают по внешнему адресу, а не только с localhost
 CALENDAR_ADMIN_OPEN=1     # админка открыта без входа — текущее решение до подключения Telegram
 CALENDAR_DATABASE_PATH=/путь/на/постоянном/диске/calendar.sqlite
 ```

@@ -10,7 +10,10 @@ if (existsSync('.env')) process.loadEnvFile('.env');
 const source = path.resolve(process.env.CALENDAR_DATABASE_PATH ?? 'data/calendar.sqlite');
 const dir = path.resolve(process.env.CALENDAR_BACKUP_DIR ?? 'backups');
 const keep = Number(process.env.CALENDAR_BACKUPS_KEEP ?? 14);
-if (!Number.isSafeInteger(keep) || keep < 1) throw new Error('CALENDAR_BACKUPS_KEEP must be a positive integer.');
+if (!Number.isSafeInteger(keep) || keep < 1) {
+  console.error(`CALENDAR_BACKUPS_KEEP должно быть целым числом от 1, сейчас: «${process.env.CALENDAR_BACKUPS_KEEP}». Копии не тронуты.`);
+  process.exit(1);
+}
 
 if (source.includes(`${path.sep}calendar-app${path.sep}`)) throw new Error('Refusing to touch the calendar-app database.');
 const stamp = new Date().toISOString().replace(/[:T]/g, '-');

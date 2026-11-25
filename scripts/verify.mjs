@@ -110,6 +110,8 @@ try {
     assert.equal(await rawStatus('/api/types', { 'X-Forwarded-Host': 'calendar.example' }), 403);
     assert.equal(await rawStatus('/api/types', { 'X-Forwarded-For': '203.0.113.7' }), 403);
     assert.equal(await rawStatus('/calendar', { Host: 'calendar.example' }), 200, 'The public calendar page stays reachable.');
+    assert.equal(await rawStatus('/api/calendar', { Host: 'calendar.example' }), 200, 'The public calendar API is not limited by CALENDAR_ALLOW_REMOTE.');
+    assert.equal(await rawStatus('/api/calendar/events/missing.ics', { Host: 'calendar.example' }) === 403, false);
   });
   await check('Session login rejects invalid token shapes and wrong values', async () => {
     for (const value of [null, {}, 123, 'forged']) {
@@ -120,7 +122,7 @@ try {
     const response = await request('/api/local-session', { auth: false, method: 'POST', body: { token } });
     assert.equal(response.status, 200);
     const header = response.headers.get('set-cookie');
-    assert.match(header, /HttpOnly/i); assert.match(header, /SameSite=Lax/i);
+    assert.match(header, /HttpOnly/i); assert.match(header, /SameSite=Lax/i); assert.doesNotMatch(header, /Secure/i, 'Plain-HTTP login works without Secure.');
     cookie = header.split(';')[0];
     assert.equal((await request('/api/types', { auth: false, headers: { Cookie: cookie } })).status, 200);
     assert.deepEqual(await list(), []);
@@ -652,6 +654,8 @@ try {
     assert.equal(await rawStatus('/api/types', { Host: 'calendar.example', 'X-Forwarded-Proto': 'https', 'X-Forwarded-For': '203.0.113.7' }), 200);
     const response = await request('/api/types', { method: 'POST', body: { name: 'Через прокси' }, origin: 'https://calendar.example', headers: { 'X-Forwarded-Proto': 'https', 'X-Forwarded-Host': 'calendar.example' } });
     assert.equal(response.status, 200, await response.text());
+    const login = await request('/api/local-session', { auth: false, method: 'POST', body: { token }, origin: 'https://calendar.example', headers: { 'X-Forwarded-Proto': 'https', 'X-Forwarded-Host': 'calendar.example' } });
+    assert.equal(login.status, 200); assert.match(login.headers.get('set-cookie'), /Secure/i, 'HTTPS login sets a Secure cookie.');
   });
   await check('Calendar account shows recognized degree data; anonymous activity does not sign a guest in', async () => {
     const guest = await (await request('/api/calendar?participant=guest-1', { auth: false })).json();

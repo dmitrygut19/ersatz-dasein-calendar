@@ -47,7 +47,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
   ensureSyncScheduler();
   const guarded = url.pathname.startsWith('/admin') || url.pathname.startsWith('/api');
   if (!guarded) return next();
-  if (!remoteAllowed() && !localRequest(context)) {
+  // Public participant surface: calendar read and activity ingest (see INTEGRATION.md).
+  // It serves the public calendar on any host; CALENDAR_ALLOW_REMOTE only limits the admin.
+  const publicApi = (url.pathname === '/api/calendar' && ['GET', 'HEAD'].includes(request.method))
+    || (url.pathname.startsWith('/api/calendar/covers/') && ['GET', 'HEAD'].includes(request.method))
+    || (url.pathname.startsWith('/api/calendar/events/') && ['GET', 'HEAD'].includes(request.method))
+    || (url.pathname === '/api/calendar/activity' && request.method === 'POST');
+  if (!publicApi && !remoteAllowed() && !localRequest(context)) {
     return denied(url.pathname, 403, 'Админка доступна только с localhost. Для сервера задайте CALENDAR_ALLOW_REMOTE=1 (см. README, раздел «Развёртывание»).');
   }
   if (!['GET', 'HEAD'].includes(request.method)) {
@@ -60,11 +66,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
   const sessionRoute = url.pathname === '/api/local-session';
-  // Public participant surface: calendar read and activity ingest (see INTEGRATION.md).
-  const publicApi = (url.pathname === '/api/calendar' && ['GET', 'HEAD'].includes(request.method))
-    || (url.pathname.startsWith('/api/calendar/covers/') && ['GET', 'HEAD'].includes(request.method))
-    || (url.pathname.startsWith('/api/calendar/events/') && ['GET', 'HEAD'].includes(request.method))
-    || (url.pathname === '/api/calendar/activity' && request.method === 'POST');
   if (sessionRoute && !localExperimentEnabled()) {
     return json({ message: 'Локальный тестовый доступ выключен.' }, 401);
   }
