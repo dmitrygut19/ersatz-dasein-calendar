@@ -48,8 +48,8 @@ const coverOptions = [
 defineExpose({
   startCreate: (name = '') => edit(undefined, name),
   startEditByName: (name: string) => { const type = types.value.find(item => item.name === name) ?? types.value[0]; if (type) return edit(type); },
-  getAppearanceDraft: () => draft.value ? { title: draft.value.name, cover: draft.value.coverPath || defaultCover, theme: draft.value.theme, appearance: draft.value.appearance ?? null } : null,
-  applyAppearance: (value: { cover: string | null; appearance: Appearance }) => { if (draft.value) { draft.value.coverPath = value.cover || defaultCover; draft.value.theme = value.appearance.theme; draft.value.appearance = value.appearance; } },
+  getAppearanceDraft: () => draft.value ? { title: draft.value.name, cover: draft.value.coverPath || null, theme: draft.value.theme, appearance: draft.value.appearance ?? null } : null,
+  applyAppearance: (value: { cover: string | null; appearance: Appearance }) => { if (draft.value) { draft.value.coverPath = value.cover || null; draft.value.theme = value.appearance.theme; draft.value.appearance = value.appearance; } },
 });
 
 async function request(url: string, options: RequestInit = {}) {
@@ -87,7 +87,7 @@ async function save() {
     // Keep server validation authoritative, including whitespace and numeric types.
     // Tiers are removed from the product (09.11.2026): stored value is always cleared.
     const saved = await request(form.id ? `/api/types/${form.id}` : '/api/types', {
-      method: form.id ? 'PUT' : 'POST', body: JSON.stringify({ name: form.name, recognitionWords: form.recognitionWords, accessLabel: form.accessLabel, tier: null, degree: form.degree, points: (form.points as unknown) === '' ? null : form.points, venue: form.venue, venueUrl: form.venueUrl, coverPath: form.coverPath || defaultCover, theme: form.theme, appearance: form.appearance ?? null }),
+      method: form.id ? 'PUT' : 'POST', body: JSON.stringify({ name: form.name, recognitionWords: form.recognitionWords, accessLabel: form.accessLabel, tier: null, degree: form.degree, points: (form.points as unknown) === '' ? null : form.points, venue: form.venue, venueUrl: form.venueUrl, coverPath: form.coverPath || '', theme: form.theme, appearance: form.appearance ?? null }),
     });
     const index = types.value.findIndex(type => type.id === saved.type.id);
     if (index < 0) types.value.push({ ...saved.type, inUse: false });

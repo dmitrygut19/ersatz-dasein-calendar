@@ -43,5 +43,12 @@ await allDayCard.getByRole('button',{name:'Редактировать'}).click()
 await page.getByRole('button',{name:'Сохранить изменения'}).click();
 await expect(page.locator('.admin-toast')).toHaveText('Изменения сохранены.');await expect(page.locator('.editor-panel .field-error')).toHaveCount(0);
 checks.push('Admin editor saves an all-day imported event without the zero-interval error');
+// A type without a cover must stay without one after it is opened and saved in the admin (no silent "Конгресс").
+{const types=(await api(a,'/api/types')).types;const target=types[0];const {id,createdAt,updatedAt,inUse,...fields}=target;
+await api(a,'/api/types/'+id,{...fields,coverPath:'',appearance:undefined},'PUT');assert.equal((await api(a,'/api/types')).types.find(t=>t.id===id).coverPath,null);
+await page.goto(base+'/admin');await page.getByRole('button',{name:`Редактировать ${target.name}`}).last().click();
+await page.locator('form').filter({has:page.getByRole('button',{name:'Сохранить',exact:true})}).getByRole('button',{name:'Сохранить',exact:true}).click();
+await expect(page.getByText('Тип сохранён.')).toBeVisible();assert.equal((await api(a,'/api/types')).types.find(t=>t.id===id).coverPath,null);
+checks.push('A type without a cover keeps no cover after being opened and saved in the admin');}
 assert.deepEqual(errors,[]);writeFileSync(path.join(directory,'report.json'),JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({directory,checks,errors}));
 }finally{await browser?.close();server.kill();}

@@ -43,7 +43,8 @@ async function removeCover(path:string){
 }
 const initialAppearance = props.initial?.appearance ?? defaultAppearance(props.initial?.theme);
 const coverMode = ref<NonNullable<Appearance['coverMode']>>(initialAppearance.coverMode ?? 'illustration');
-const cover = ref(props.initial?.cover || defaultCover), theme = ref(initialAppearance.theme);
+// A type or event without a cover stays without one; only a brand-new draft starts from the default.
+const cover = ref<string | null>(props.initial ? props.initial.cover || null : defaultCover), theme = ref(initialAppearance.theme);
 const initialButton = buttonDefaults(initialAppearance.theme);
 const colors = ref({ start: initialAppearance.start, end: initialAppearance.end, accent: initialAppearance.accent, text: initialAppearance.text,
   buttonBackground: initialAppearance.buttonBackground ?? initialButton.background, buttonText: initialAppearance.buttonText ?? initialButton.text, buttonAccent: initialAppearance.buttonAccent ?? initialButton.accent });
@@ -127,7 +128,7 @@ async function apply() {
       <LinoSwitch v-if="modern" id="appearance-bordered" v-model="bordered" label="Обводка"/><fieldset v-else class="inline-options"><legend>Обводка</legend><RadioControl v-model="borderChoice" value="true" :name="'appearance-border-' + buttonFilterId" label="С обводкой" compact/><RadioControl v-model="borderChoice" value="false" :name="'appearance-border-' + buttonFilterId" label="Без обводки" compact/></fieldset>
     </div>
     <MentorButton :disabled="busy" @click="apply">{{ busy ? 'Загрузка…' : 'Применить' }}</MentorButton>
-    <h2>Событие в календаре</h2><div class="appearance-preview"><div><p>В календаре</p><div class="preview-cell" :class="'preview-cell-' + coverMode" :style="preview"><span>13 · 20:00</span><img :src="cover" alt="Выбранная обложка"/><p>{{ initial?.title || 'Событие' }}</p></div></div><div class="preview-event" :class="'preview-event-' + coverMode" :style="preview"><img :src="cover" alt=""/><h3>{{ initial?.title || 'Событие' }}</h3><p>13 сентября 2026, 20:00</p><p>Событие только для участников</p><MentorButton full-width :palette="buttonPalette" :artwork-filter="buttonFilterId">К событию</MentorButton></div></div>
+    <h2>Событие в календаре</h2><div class="appearance-preview"><div><p>В календаре</p><div class="preview-cell" :class="'preview-cell-' + coverMode" :style="preview"><span>13 · 20:00</span><img v-if="cover" :src="cover" alt="Выбранная обложка"/><p>{{ initial?.title || 'Событие' }}</p></div></div><div class="preview-event" :class="'preview-event-' + coverMode" :style="preview"><img v-if="cover" :src="cover" alt=""/><h3>{{ initial?.title || 'Событие' }}</h3><p>13 сентября 2026, 20:00</p><p>Событие только для участников</p><MentorButton full-width :palette="buttonPalette" :artwork-filter="buttonFilterId">К событию</MentorButton></div></div>
   </section>
 </template>
 <style scoped>
