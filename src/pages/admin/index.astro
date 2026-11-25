@@ -11,4 +11,4 @@ const types = listTypes();
 const screen = Astro.url.searchParams.get('screen') ?? 'calendar';
 const initialUi = (Astro.url.searchParams.get('adminUi') ?? process.env.CALENDAR_ADMIN_UI ?? 'lino') === 'classic' ? 'classic' : 'lino';
 ---
-<!doctype html><html lang="ru" data-admin-release="2026-11-25-without-demo"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Админка календаря</title></head><body><AdminWorkspace initialTypes={types} initialScreen={screen} initialUi={initialUi} client:load/></body></html>
+<!doctype html><html lang="ru" data-admin-release="2026-11-25-without-demo"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Админка календаря</title><link rel="icon" href="data:,"/></head><body><AdminWorkspace initialTypes={types} initialScreen={screen} initialUi={initialUi} client:load/></body></html>

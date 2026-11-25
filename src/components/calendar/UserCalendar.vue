@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, useId } from 'vue';
+import { uuid } from '../../lib/uuid';
 import MentorButton from '../ui/MentorButton.vue';
 import EventDetailCard from './EventDetailCard.vue';
 import MobileEventDialog from './MobileEventDialog.vue';
@@ -84,7 +85,6 @@ const gated = computed(() => !props.embedded && Boolean(selected.value && (!sele
 const needsDegree = computed(() => selected.value?.requirements?.some(row => row.kind === 'degree' || row.kind === 'tier'));
 const memberships = computed(() => selected.value?.requirements?.filter(row => row.kind === 'membership') ?? []);
 const calendarHref = computed(() => selected.value?.calendarUrl?.startsWith('/api/') ? selected.value.calendarUrl + '?participant=' + encodeURIComponent(identity.telegramId) + reviewQuery() : selected.value?.calendarUrl);
-watch(() => selected.value?.id, () => { coverFailed.value = false; coverBottomSpace.value = 0; });
 function authorizeCard() {
   notify('Telegram-авторизация пока не подключена.');
 }
@@ -186,7 +186,7 @@ onBeforeUnmount(() => { clearInterval(refreshTimer); clearTimeout(timer); });
 let identity = { telegramId: '', nick: '' };
 function initializeIdentity() {
   let id = localStorage.getItem('calendar-participant-id');
-  if (!id) { id = crypto.randomUUID(); localStorage.setItem('calendar-participant-id', id); }
+  if (!id) { id = uuid(); localStorage.setItem('calendar-participant-id', id); }
   identity = { telegramId: id, nick: `Гость ${id.slice(0, 4)}` };
 }
 
@@ -267,6 +267,8 @@ const cardDateLabel = computed(() => {
 });
 const coverImage = ref<HTMLImageElement | null>(null);
 const coverBottomSpace = ref(0);
+// Declared after `selected`: a watch source runs immediately and must not read it before initialisation.
+watch(() => selected.value?.id, () => { coverFailed.value = false; coverBottomSpace.value = 0; });
 const closeOnDark = ref(false);
 watch(() => [selected.value?.id, selected.value?.cover, selected.value?.appearance?.start], () => {
   const background = selected.value?.appearance?.start;

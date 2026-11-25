@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {nextTick,onBeforeUnmount,onMounted,onUpdated,ref,watch} from 'vue';
+import {uuid} from '../../lib/uuid';
 const props=defineProps<{active:boolean;controlsId:string;contentKey?:string}>();
 const emit=defineEmits<{close:[]}>();
 const dialog=ref<HTMLDialogElement|null>(null);
@@ -138,7 +139,7 @@ async function open(){
     for(const [name,value,priority] of previous) value?body.style.setProperty(name,value,priority):body.style.removeProperty(name);
     window.scrollTo(savedScroll.x,savedScroll.y);
   };
-  token=crypto.randomUUID();closing=false;
+  token=uuid();closing=false;
   scrollRestoration=history.scrollRestoration;history.scrollRestoration='manual';
   history.pushState({...history.state,[historyKey]:token},'');
   dialog.value.showModal();

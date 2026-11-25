@@ -1,2 +1,6 @@
-# Preserve the supplied Figma SVG exports byte-for-byte on every platform.
+# Text files keep LF on every platform, so a Windows checkout stays clean after the build
+# regenerates tokens.css and admin-lino-kit.css (regardless of a global core.autocrlf).
+* text=auto eol=lf
+
+# Preserve the supplied Figma SVG exports byte-for-byte on every platform (must stay after the rule above).
 /public/assets/lodge-covers/*.svg -text

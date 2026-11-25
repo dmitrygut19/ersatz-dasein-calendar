@@ -8,6 +8,7 @@ import RepeatSettings from '../ui/RepeatSettings.vue';
 import type { DemoEvent } from '../../lib/admin-demo';
 import AppearanceEditor from './AppearanceEditor.vue';
 import type { Appearance } from '../../lib/appearance';
+import { uuid } from '../../lib/uuid';
 import { linoSurface as vLinoSurface } from '../../lib/lino-card-frame';
 import { normalizedAppearance } from '../../lib/event-settings';
 import {useAdminLino} from '../../lib/admin-ui';
@@ -22,7 +23,7 @@ const emit = defineEmits<{ save: [event: DemoEvent & { repeatRule: unknown | nul
 
 const editing = computed(() => Boolean(props.initial));
 const source = props.initial ?? null;
-const draftId = source?.id ?? crypto.randomUUID();
+const draftId = source?.id ?? uuid();
 const name = ref(source?.title ?? '');
 const type = ref(source?.typeName && props.typeNames.includes(source.typeName) ? source.typeName : props.typeNames[0] ?? 'Конгресс');
 const date = ref(source?.date ?? (props.initialDate || new Intl.DateTimeFormat('sv-SE', {timeZone:'Europe/Moscow'}).format(new Date())));
